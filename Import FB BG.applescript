@@ -1,8 +1,8 @@
 tell application "Keyboard Maestro Engine"
 	set tempvar to make new variable with properties {name:"Job Number"}
 	set currentJob to value of tempvar
-	set tempvar to make variable with properties {name:"copied path"}
-	set copiedPath to value of tempvar
+	set tempvar to make variable with properties {name:"Previous Job Number"}
+	set OldJN to value of tempvar
 end tell
 
 tell application "QuarkXPress"
@@ -68,8 +68,15 @@ tell application "QuarkXPress"
 			end tell
 		end try
 	end tell
-	
-	--opens previous job
+end tell
+
+--gets the path to the old job copied to new folder and saves it to Keyboard Maestro
+set shellScriptString to quoted form of "/Volumes/HOM_shortrun/~Hom Active Jobs/" & currentJob & "/" & OldJN & "*/" & OldJN & "*HOM.qxp"
+set copiedPath to do shell script "find " & shellScriptString
+set copiedPath to POSIX file copiedPath
+
+--opens previous job
+tell application "QuarkXPress"
 	try
 		open file copiedPath
 	end try

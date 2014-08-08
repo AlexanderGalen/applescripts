@@ -1,5 +1,3 @@
---annotations for a this script(well, one that is very similar at least) can be found in the script "Resource:Scripting:AAASpectacularAlex Scripts:Copy Old Job to New Folder"
-
 tell application "Keyboard Maestro Engine"
 	set myVar1 to make variable with properties {name:"Job Number"}
 	set NewJN to value of myVar1
@@ -21,9 +19,9 @@ tell application "Finder"
 			return "script exited because it encountered an error"
 		end try
 	end if
-	set JobFolder to "HOM_Shortrun:~HOM Active Jobs:" & NewJN & ":"
+	set jobFolder to "HOM_Shortrun:~HOM Active Jobs:" & NewJN & ":"
 	set NewWindow to make new Finder window
-	set properties of NewWindow to {target:JobFolder, position:{-635, 78}, bounds:{-635, 78, 0, 568}, current view:column view, sidebar width:205}
+	set properties of NewWindow to {target:jobFolder, position:{-635, 78}, bounds:{-635, 78, 0, 568}, current view:column view, sidebar width:205}
 end tell
 
 
@@ -99,15 +97,6 @@ try
 			do shell script " cp -Rp \"" & SearchTerm & "\"* \"/volumes/HOM_Shortrun/~HOM Active Jobs/" & NewJN & "/\""
 			
 		end if
-	end tell
-	
-	--gets the path to the old job copied to new folder and saves it to Keyboard Maestro
-	set shellScriptString to quoted form of "/Volumes/HOM_shortrun/~Hom Active Jobs/" & NewJN & "/" & OldJN & "*/" & OldJN & "*HOM.qxp"
-	set copiedPath to do shell script "find " & shellScriptString
-	set copiedPath to POSIX file copiedPath
-	
-	tell application "Keyboard Maestro Engine"
-		make new variable with properties {name:"copied path", value:copiedPath}
 	end tell
 	
 	--if even that fails, Displays a Dialog stating that the script failed
