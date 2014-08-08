@@ -1,4 +1,4 @@
---these subroutines take a non-posix path as parameters. they fail if there is nothing in the folder so it checks first and does nothing if folder is empty
+--these subroutines take a mac path as parameters. they fail if there is nothing in the folder so it checks first and does nothing if folder is empty
 
 on cp_all(source, destination)
 	tell application "Finder"
