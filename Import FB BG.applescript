@@ -71,8 +71,8 @@ tell application "QuarkXPress"
 end tell
 
 --gets the path to the old job copied to new folder and saves it to Keyboard Maestro
-set shellScriptString to quoted form of "/Volumes/HOM_shortrun/~Hom Active Jobs/" & currentJob & "/" & OldJN & "*/" & OldJN & "*HOM.qxp"
-set copiedPath to do shell script "find " & shellScriptString
+set shellScriptPath to "find " & quoted form of "/Volumes/HOM_shortrun/~Hom Active Jobs/" & currentJob & "/" & OldJN & "*/" & OldJN & "*HOM.qxp" & " | head -n 1"
+set copiedPath to do shell script "find " & shellScriptPath
 set copiedPath to POSIX file copiedPath
 
 --opens previous job
@@ -80,5 +80,5 @@ tell application "QuarkXPress"
 	try
 		open file copiedPath
 	end try
-	
+	activate
 end tell
