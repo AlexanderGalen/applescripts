@@ -226,7 +226,7 @@ repeat while ExitVariable is not "Exit"
 						
 						-- shell script that finds and copies old job folder to new one
 						
-						cp(thisSource,thisJobFolder)
+						cp_all(thisSource,thisJobFolder)
 						
 					end if
 				end tell
@@ -288,14 +288,14 @@ repeat while ExitVariable is not "Exit"
 		repeat with thisImage in imageNames
 
 		--sets variable specific to this row
-			tell application "Finder"
-				if contents of thisImage is not "" then
+			if contents of thisImage is not "" then
+				tell application "Finder"	
 					if (exists file thisImage of folder jobnumber of folder activeJobsFolder) then
 						set fileToDelete to clientImagesFolder & thisImage as string
-						rm(fileToDelete)
 					end if
-				end if
-			end tell
+				end tell
+				rm(fileToDelete)
+			end if
 		end repeat
 	set i to i + 1
 end repeat
