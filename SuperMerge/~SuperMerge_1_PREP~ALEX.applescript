@@ -1,4 +1,5 @@
 --these subroutines take a mac path as parameters. they fail if there is nothing in the folder so it checks first and does nothing if folder is empty
+--copy functions will replace existing files
 
 on cp_all(source, destination)
 	tell application "Finder"
