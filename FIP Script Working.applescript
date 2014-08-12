@@ -1,12 +1,5 @@
---on adding folder items to this_folder after receiving these_items
-
-
---sets the current time as a variable(StartTime) for logging
-set T1 to minutes of (current date)
-set T1s to seconds of (current date)
-
-set TempTime to time string of (current date)
-set StartTime to characters 1 through 8 of TempTime as text
+set StartTime to characters 1 through 8 of time string of (current date) as text
+set startSeconds to time of (current date)
 
 --gets contents of hot folder
 tell application "Finder"
@@ -234,14 +227,11 @@ repeat with TheItem in filelist
 		end tell
 	end timeout
 	
-	--sets the current time as a variable(FinishTime) for logging
-	
-	set TempTime to time string of (current date)
-	set FinishTime to characters 1 through 8 of TempTime as text
-	
-	set T2 to minutes of (current date)
-	set T2s to seconds of (current date)
-	set TotalTime to (((T2 * 60) + T2s) - ((T1 * 60) + T1s)) / 60
+
+	set FinishTime to characters 1 through 8 of time string of (current date) as text
+	set endSeconds to time of (current date)
+
+	set timeDiff to round(((endSeconds - startSeconds) * 100)) /100 
 	
 	--opens the logs and inputs this jobs info at the end of the log
 	
@@ -255,7 +245,7 @@ repeat with TheItem in filelist
 					set value of column 2 to OrderNumber
 					set value of column 3 to StartTime
 					set value of column 4 to FinishTime
-					set value of column 5 to TotalTime
+					set value of column 5 to timeDiff
 					exit repeat
 				end if
 				set i to i + 1
@@ -264,6 +254,4 @@ repeat with TheItem in filelist
 		close active workbook saving yes
 	end tell
 	
-	
 end repeat
---end adding folder items to
