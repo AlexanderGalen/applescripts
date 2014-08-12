@@ -58,7 +58,7 @@ repeat while ExitVariable is not "Exit"
 				set prevInfo to string value of cell 35
 			end tell
 		end tell
-
+		
 		--sets variables specific to this row
 		set thisQuarkDoc to mergedQuarkDocsFolder & quarkName as string
 		set thisJobFolder to activeJobsFolder & jobnumber as string
@@ -77,166 +77,165 @@ repeat while ExitVariable is not "Exit"
 				make new folder at folder activeJobsFolder with properties {name:jobnumber}
 			end if
 		end tell
-
-			cp(thisQuarkDoc,thisJobFolder)
-			
-			
-			--checking values of prev info/art cells; skips copying if they are different values or both empty
-			--sets value of prevJob if they are the same or only one has a value
-			--its kinda wonky but I know whats going on
-			
-			
-			set prevJob to ""
-			set skipvar to ""
-			
-			
-			if prevArt is "" and prevInfo is "" then
-				--both blank; skip old job folder copy
-				set skipvar to "Skip"
-			else
-				set prevjobstatus to "Not Both Blank"
-				if prevArt is "" or prevInfo is "" then
-					--one blank; set whichever is not blank to prevJob
-					if prevArt is "" then
-						set prevJob to prevInfo
-						set skipvar to "NoSkip"
-					else
-						set prevJob to prevArt
-						set skipvar to "NoSkip"
-					end if
+		
+		cp(thisQuarkDoc, thisJobFolder)
+		
+		
+		--checking values of prev info/art cells; skips copying if they are different values or both empty
+		--sets value of prevJob if they are the same or only one has a value
+		--its kinda wonky but I know whats going on
+		
+		
+		set prevJob to ""
+		set skipvar to ""
+		
+		
+		if prevArt is "" and prevInfo is "" then
+			--both blank; skip old job folder copy
+			set skipvar to "Skip"
+		else
+			set prevjobstatus to "Not Both Blank"
+			if prevArt is "" or prevInfo is "" then
+				--one blank; set whichever is not blank to prevJob
+				if prevArt is "" then
+					set prevJob to prevInfo
+					set skipvar to "NoSkip"
 				else
-					--neither blank; check values to see if they are the same
-					if prevArt is not prevInfo then
-						--neither blank; different values. skip old job folder copy
-						set skipvar to "Skip"
-					else
-						--neither blank; identical values. set value to prevJob
-						set prevJob to prevArt
-						set skipvar to "NoSkip"
-					end if
+					set prevJob to prevArt
+					set skipvar to "NoSkip"
+				end if
+			else
+				--neither blank; check values to see if they are the same
+				if prevArt is not prevInfo then
+					--neither blank; different values. skip old job folder copy
+					set skipvar to "Skip"
+				else
+					--neither blank; identical values. set value to prevJob
+					set prevJob to prevArt
+					set skipvar to "NoSkip"
 				end if
 			end if
+		end if
+		
+		--checks if value of Prevjob is the default value, meaning the customer accidentally entered a useless value. also skips copying for group orders, except for the first one.
+		if prevJob is "Enter previous order number" then
+			set skipvar to "skip"
+		end if
+		
+		--skips over copying old job if the result of value check determines that it should be skipped
+		
+		if skipvar is "Skip" then
+			exit repeat
+		end if
+		
+		
+		--this if block checks the length of prevJob from the database, strips HOM from the beginning if it is there, or allows the user
+		--to input the previous Job number manually if it is an unsual length
+		
+		
+		if length of prevJob is 9 then
+			set prevJob to characters 4 thru 9 of prevJob as string
 			
-			--checks if value of Prevjob is the default value, meaning the customer accidentally entered a useless value. also skips copying for group orders, except for the first one.
-			if prevJob is "Enter previous order number" then
-				set skipvar to "skip"
-			end if
+			--if the length of prevJob is not 6 or 9, asks user to enter previous job number manually
+		else if length of prevJob is not 6 then
+			--previous job number is not 6 or 9 characters long. Script does not yet have a way to deduce a usable job number from this yet. Skips copying this job.
+			set skipvar to "Skip"
+		end if
+		
+		--an error check to make sure prevJob is an integer
+		try
+			set prevJob to prevJob as integer
+		on error
+			--prevJob cannot be coerced into an integer. Likely contains alpha characters. Script does not yet have a way to deduc a usable job number from this. Skips copying this job.
+			set skipvar to "Skip"
+		end try
+		
+		--if script was unable to get a usable previous job number, skips copying the previous job.
+		if skipvar is "Skip" then
+			exit repeat
+		end if
+		
+		--this whole chunk is my (alex's) copy old job to new folder script
+		--whole copying process is wrapped in a try block. If it fails, it just continues on to the next job.
+		try
 			
-			--skips over copying old job if the result of value check determines that it should be skipped
+			--this is for if the job is in the older archives
 			
-			if skipvar is "Skip" then
-				exit repeat
-			end if
-			
-			
-			--this if block checks the length of prevJob from the database, strips HOM from the beginning if it is there, or allows the user
-			--to input the previous Job number manually if it is an unsual length
-			
-			
-			if length of prevJob is 9 then
-				set prevJob to characters 4 thru 9 of prevJob as string
+			if prevJob is less than 226000 then
 				
-				--if the length of prevJob is not 6 or 9, asks user to enter previous job number manually
-			else if length of prevJob is not 6 then
-				--previous job number is not 6 or 9 characters long. Script does not yet have a way to deduce a usable job number from this yet. Skips copying this job.
-				set skipvar to "Skip"
+				set copyvar to false
+				set Chars to characters of prevJob
+				set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
+				set OldPth to "ARCHIVES VINTAGE:HOM Archive Jobs:" & First3 & "xxx.jobs:"
+				set thisSource to OldPth & prevJob
+				
+				-- shell script that finds and copies old job folder to new one
+				cp_all(thisSource, thisJobFolder)
+				
 			end if
 			
-			--an error check to make sure prevJob is an integer
-			try
-				set prevJob to prevJob as integer
-			on error
-				--prevJob cannot be coerced into an integer. Likely contains alpha characters. Script does not yet have a way to deduc a usable job number from this. Skips copying this job.
-				set skipvar to "Skip"
-			end try
+			--Checks Various folders where old job might be
 			
-			--if script was unable to get a usable previous job number, skips copying the previous job.
-			if skipvar is "Skip" then
-				exit repeat
-			end if
-			
-			--this whole chunk is my (alex's) copy old job to new folder script
-			--whole copying process is wrapped in a try block. If it fails, it just continues on to the next job.
-			try
+			tell application "Finder"
 				
-				--this is for if the job is in the older archives
-				
-				if prevJob is less than 226000 then
+				--checks for old job in HOM Calendars 2006; copies if found
+				if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob then
+					set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob
+					
+					--checks if _1 is appended to end of folder name in 2006 calendars
+				else if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1" then
+					set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1"
+					
+					--checks for old job in HOM Calendars PRINTED; copies if found
+				else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob then
+					set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob
+					
+					--checks if _1 is appended to end of folder name in HOM Calendars PRINTED
+				else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1" then
+					set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1"
+					
+					--checks for old job in HOM Printed Jobs; copies if found
+				else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob then
+					set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob
+					
+					--checks if _1 is appended to end of folder name in Printed
+				else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1" then
+					set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1"
+					
+					--checks for old job in Active Jobs; copies if found
+				else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob then
+					set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob
+					
+					--checks if _1 is appended to end of folder name in active
+				else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1" then
+					set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1"
+					
+					
+					--if none of those exist, checks the archives for the folder
+					
+				else
 					
 					set copyvar to false
+					--converts prevJob back into a string
+					set prevJob to prevJob as string
+					
 					set Chars to characters of prevJob
 					set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
-					set OldPth to "ARCHIVES VINTAGE:HOM Archive Jobs:" & First3 & "xxx.jobs:"
+					set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & First3 & "xxx.jobs:"
 					set thisSource to OldPth & prevJob
 					
-					-- shell script that finds and copies old job folder to new one
-					cp_all(thisSource,thisJobFolder)
-					
 				end if
-				
-				--Checks Various folders where old job might be
-				
-				tell application "Finder"
-					
-					--checks for old job in HOM Calendars 2006; copies if found
-					if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob then
-						set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob
-						
-						--checks if _1 is appended to end of folder name in 2006 calendars
-					else if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1" then
-						set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1"
-						
-						--checks for old job in HOM Calendars PRINTED; copies if found
-					else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob then
-						set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob
-						
-						--checks if _1 is appended to end of folder name in HOM Calendars PRINTED
-					else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1" then
-						set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1"
-						
-						--checks for old job in HOM Printed Jobs; copies if found
-					else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob then
-						set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob
-						
-						--checks if _1 is appended to end of folder name in Printed
-					else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1" then
-						set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1"
-						
-						--checks for old job in Active Jobs; copies if found
-					else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob then
-						set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob
-						
-						--checks if _1 is appended to end of folder name in active
-					else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1" then
-						set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1"
-						
-						
-						--if none of those exist, checks the archives for the folder
-						
-					else
-						
-						set copyvar to false
-						--converts prevJob back into a string
-						set prevJob to prevJob as string
-						
-						set Chars to characters of prevJob
-						set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
-						set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & First3 & "xxx.jobs:"
-						set thisSource to OldPth & prevJob
-						
-						-- shell script that finds and copies old job folder to new one
-						
-						cp_all(thisSource,thisJobFolder)
-						
-					end if
-				end tell
-									
-					--duplicates whichever path was found to exist into the Active Job Folder
-					if copyvar is true then
-						cp(FinishedOldPath,thisJobFolder)
-					end if
-			on error				
-			end try
+			end tell
+			
+			--duplicates whichever path was found to exist into the Active Job Folder
+			if copyvar is true then
+				cp(FinishedOldPath, thisJobFolder)
+			else
+				-- shell script that finds and copies old job folder to new one
+				--this will only happen if old job was in archives
+				cp_all(thisSource, thisJobFolder)
+			end if
+		end try
 		
 		--end of the copy old folder to new folder
 		
@@ -244,16 +243,16 @@ repeat while ExitVariable is not "Exit"
 	end repeat
 	--end of first pseudo repeat loop and beginning of second
 	repeat 1 times
-			
+		
 		--moves image files to Job Folder in Active Jobs
 		repeat with thisImage in imageNames
-
+			
 			--sets variables specific to this row
 			set thisImagePath to clientImagesFolder & thisImage
-
+			
 			if contents of thisImage is not "" then
 				try
-					cp(thisImagePath,thisJobFolder)					
+					cp(thisImagePath, thisJobFolder)
 				on error
 					
 					set logText to time string of (current date) & "Job Number: " & jobnumber & "File Name: " & thisImage as text
@@ -285,18 +284,18 @@ repeat while ExitVariable is not "Exit"
 	end tell
 	if jobnumber is "" then exit repeat
 	
-		repeat with thisImage in imageNames
-
+	repeat with thisImage in imageNames
+		
 		--sets variable specific to this row
-			if contents of thisImage is not "" then
-				tell application "Finder"	
-					if (exists file thisImage of folder jobnumber of folder activeJobsFolder) then
-						set fileToDelete to clientImagesFolder & thisImage as string
-					end if
-				end tell
-				rm(fileToDelete)
-			end if
-		end repeat
+		if contents of thisImage is not "" then
+			tell application "Finder"
+				if (exists file thisImage of folder jobnumber of folder activeJobsFolder) then
+					set fileToDelete to clientImagesFolder & thisImage as string
+				end if
+			end tell
+			rm(fileToDelete)
+		end if
+	end repeat
 	set i to i + 1
 end repeat
 
@@ -308,7 +307,7 @@ end tell
 set originalImagesFolder to "HOM_Shortrun:SUPERmergeOUT:Original Client Images:"
 set pdfsToProcessFolder to "HOM_Shortrun:PDFs to process:"
 set imagesToProcessFolder to "HOM_Shortrun:Process Client Images:"
-cp_all(pdfsToProcessFolder,originalImagesFolder)
+cp_all(pdfsToProcessFolder, originalImagesFolder)
 rm_all(pdfsToProcessFolder)
-cp_all(imagesToProcessFolder,originalImagesFolder)
+cp_all(imagesToProcessFolder, originalImagesFolder)
 rm_all(imagesToProcessFolder)
