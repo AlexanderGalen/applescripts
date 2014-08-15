@@ -291,9 +291,13 @@ repeat while ExitVariable is not "Exit"
 			tell application "Finder"
 				if (exists file thisImage of folder jobnumber of folder activeJobsFolder) then
 					set fileToDelete to clientImagesFolder & thisImage as string
+				else 
+					set fileToDelete to ""
 				end if
 			end tell
-			rm(fileToDelete)
+			if fileToDelete is not "" then
+				rm(fileToDelete)	
+			end if
 		end if
 	end repeat
 	set i to i + 1
