@@ -1,6 +1,3 @@
-set StartTime to characters 1 through 8 of time string of (current date) as text
-set startSeconds to time of (current date)
-
 --gets contents of hot folder
 tell application "Finder"
 	set filelist to files of folder POSIX file "/Volumes/MERGE CENTRAL/FIP AUTOMATION/Hot Folder/" as alias list
@@ -72,6 +69,9 @@ end repeat
 
 --actually works on the orders
 repeat with TheItem in filelist
+
+set StartTime to characters 1 through 8 of time string of (current date) as text
+set startSeconds to time of (current date)
 	
 	set ExitVar to ""
 	
