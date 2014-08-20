@@ -231,7 +231,8 @@ repeat with TheItem in filelist
 	set FinishTime to characters 1 through 8 of time string of (current date) as text
 	set endSeconds to time of (current date)
 	
-	set timeDiff to round (((endSeconds - startSeconds) * 100)) / 100
+	set secondDiff to endSeconds - startSeconds
+	set timeDiff to format (secondDiff / 60) into "000.00" 
 	
 	--opens the logs and inputs this jobs info at the end of the log
 	
