@@ -227,11 +227,11 @@ repeat with TheItem in filelist
 		end tell
 	end timeout
 	
-
+	
 	set FinishTime to characters 1 through 8 of time string of (current date) as text
 	set endSeconds to time of (current date)
-
-	set timeDiff to round(((endSeconds - startSeconds) * 100)) /100 
+	
+	set timeDiff to round (((endSeconds - startSeconds) * 100)) / 100
 	
 	--opens the logs and inputs this jobs info at the end of the log
 	
