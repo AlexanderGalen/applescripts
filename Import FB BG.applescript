@@ -40,9 +40,10 @@ else
 	set theFile to "HOM_Shortrun:SUPERmergeIN:Custom Magnet Backgrounds:FB:FBFC14-"
 end if
 
-tell application "System Events"
+tell application "QuarkXPress"
 	set theinfo to text returned of (display dialog "input file info" default answer "")
 end tell
+
 if length of theinfo is 4 then
 	set theinfo to "0" & theinfo
 else if length of theinfo is 3 then
@@ -61,11 +62,8 @@ tell application "QuarkXPress"
 		try
 			set image 1 of theBox to alias theFile
 		on error
-			tell application "System Events"
-				display dialog "An Error Occured"
-				activate
-				return
-			end tell
+			display dialog "An Error Occured"
+			return
 		end try
 	end tell
 end tell
