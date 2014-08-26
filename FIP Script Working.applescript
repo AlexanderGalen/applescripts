@@ -69,9 +69,9 @@ end repeat
 
 --actually works on the orders
 repeat with TheItem in filelist
-
-set StartTime to characters 1 through 8 of time string of (current date) as text
-set startSeconds to time of (current date)
+	
+	set StartTime to characters 1 through 8 of time string of (current date) as text
+	set startSeconds to time of (current date)
 	
 	set ExitVar to ""
 	
@@ -204,18 +204,10 @@ set startSeconds to time of (current date)
 	end repeat
 	set ExitVar to ""
 	
-	--closes the excel document without saving	
-	
+	--closes the excel document without saving
 	
 	tell application "Microsoft Excel"
 		close active workbook saving no
-	end tell
-	
-	--moves merged excel doc into merged folder
-	
-	tell application "Finder"
-		duplicate ExcelDoc to "ART DEPARTMENT-NEW:For SQL:FIP:Merged:"
-		delete ExcelDoc
 	end tell
 	
 	--saves changes made to new PDF
@@ -232,7 +224,7 @@ set startSeconds to time of (current date)
 	set endSeconds to time of (current date)
 	
 	set secondDiff to endSeconds - startSeconds
-	set timeDiff to format (secondDiff / 60) into "000.00" 
+	set timeDiff to format (secondDiff / 60) into "000.00"
 	
 	--opens the logs and inputs this jobs info at the end of the log
 	
@@ -253,6 +245,13 @@ set startSeconds to time of (current date)
 			end tell
 		end repeat
 		close active workbook saving yes
+	end tell
+	
+	--moves merged excel doc into merged folder
+	
+	tell application "Finder"
+		duplicate ExcelDoc to "ART DEPARTMENT-NEW:For SQL:FIP:Merged:"
+		delete ExcelDoc
 	end tell
 	
 end repeat
