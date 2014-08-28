@@ -35,8 +35,15 @@ on rm(source)
 	do shell script "rm -d -f " & source
 end rm
 
+on logToFile(logText, LogFile)
+	open for access file LogFile with write permission
+	write (logText & return) to file LogFile starting at eof
+	close access file LogFile
+end logToFile
+
 --initializing some variables
 set copyvar to true
+set LogFile to "HOM_Shortrun:Merge Error Log.txt"
 set ExitVariable to ""
 set superMergeDB to "HOM_Shortrun:Databases:Supermerge.THIS.txt"
 set activeJobsFolder to "HOM_Shortrun:~HOM Active Jobs:"
@@ -235,6 +242,9 @@ repeat while ExitVariable is not "Exit"
 				--this will only happen if old job was in archives
 				cp_all(thisSource, thisJobFolder)
 			end if
+		on error errStr number errorNumber
+			set logText to time string of (current date) & tab & "Job Number: " & jobnumber & tab & "Previous Job: " & prevJob & tab & "Error Message: " & errStr & " " & errorNumber as text
+			logToFile(logText, LogFile)
 		end try
 		
 		--end of the copy old folder to new folder
@@ -253,14 +263,9 @@ repeat while ExitVariable is not "Exit"
 			if contents of thisImage is not "" then
 				try
 					cp(thisImagePath, thisJobFolder)
-				on error
-					
-					set logText to time string of (current date) & "Job Number: " & jobnumber & "File Name: " & thisImage as text
-					set LogFile to "HOM_Shortrun:Merge Error Log.txt"
-					open for access file LogFile with write permission
-					write (logText & return) to file LogFile starting at eof
-					close access file LogFile
-					
+				on error errStr number errorNumber
+					set logText to time string of (current date) & tab & "Job Number: " & jobnumber & tab & "File Name: " & thisImage & tab & "Error Message: " & errStr & " " & errorNumber as text
+					logToFile(logText, LogFile)
 				end try
 			end if
 		end repeat
