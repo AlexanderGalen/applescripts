@@ -243,7 +243,7 @@ repeat while ExitVariable is not "Exit"
 				cp_all(thisSource, thisJobFolder)
 			end if
 		on error errStr number errorNumber
-			set logText to time string of (current date) & tab & "Job Number: " & jobnumber & tab & "Previous Job: " & prevJob & tab & "Error Message: " & errStr & " " & errorNumber as text
+			set logText to (current date) & tab & jobnumber & tab & tab & prevJob & tab &  errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
 		end try
 		
@@ -264,7 +264,7 @@ repeat while ExitVariable is not "Exit"
 				try
 					cp(thisImagePath, thisJobFolder)
 				on error errStr number errorNumber
-					set logText to time string of (current date) & tab & "Job Number: " & jobnumber & tab & "File Name: " & thisImage & tab & "Error Message: " & errStr & " " & errorNumber as text
+					set logText to (current date) & tab & jobnumber & tab & thisImage & tab & tab & errStr & tab & errorNumber as text
 					logToFile(logText, LogFile)
 				end try
 			end if
