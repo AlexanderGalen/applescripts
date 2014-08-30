@@ -36,6 +36,7 @@ on rm(source)
 end rm
 
 on logToFile(logText, LogFile)
+	set errorOccured to false
 	open for access file LogFile with write permission
 	write (logText & return) to file LogFile starting at eof
 	close access file LogFile
@@ -44,6 +45,7 @@ end logToFile
 --initializing some variables
 set copyvar to true
 set LogFile to "HOM_Shortrun:Merge Error Log.txt"
+set errorOccured to false
 set ExitVariable to ""
 set superMergeDB to "HOM_Shortrun:Databases:Supermerge.THIS.txt"
 set activeJobsFolder to "HOM_Shortrun:~HOM Active Jobs:"
@@ -320,3 +322,12 @@ cp_all(pdfsToProcessFolder, originalImagesFolder)
 rm_all(pdfsToProcessFolder)
 cp_all(imagesToProcessFolder, originalImagesFolder)
 rm_all(imagesToProcessFolder)
+
+--displays a dialog to alert user if there were any errors, or exit cleanly if not
+
+if errorsOccured
+	tell application "Microsoft Excel"
+		open file "HOM_Shortrun:Merge Error Log.txt"
+	end tell
+	display dialog "Some jobs did not process correctly"
+end if
