@@ -1,3 +1,11 @@
+--declares the log to file function
+on logToFile(logText, LogFile)
+	set errorOccured to false
+	open for access file LogFile with write permission
+	write (logText & return) to file LogFile starting at eof
+	close access file LogFile
+end logToFile
+
 --gets contents of hot folder
 tell application "Finder"
 	set filelist to files of folder POSIX file "/Volumes/MERGE CENTRAL/FIP AUTOMATION/Hot Folder/" as alias list
@@ -224,28 +232,14 @@ repeat with TheItem in filelist
 	set endSeconds to time of (current date)
 	
 	set secondDiff to endSeconds - startSeconds
-	set timeDiff to format (secondDiff / 60) into "000.00"
+	set timeDiff to format (secondDiff / 60) into "00.00"
 	
-	--opens the logs and inputs this jobs info at the end of the log
-	
-	tell application "Microsoft Excel"
-		open "MERGE CENTRAL:FIP AUTOMATION:Logs:FIP Automation Log.xlsx"
-		set i to 2
-		repeat
-			tell row i
-				if value of column 1 is "" then
-					set value of column 1 to TotalQty
-					set value of column 2 to OrderNumber
-					set value of column 3 to StartTime
-					set value of column 4 to FinishTime
-					set value of column 5 to timeDiff
-					exit repeat
-				end if
-				set i to i + 1
-			end tell
-		end repeat
-		close active workbook saving yes
-	end tell
+	--opens the logs and inputs this job's info at the end of the log
+	set thisUsername to short user name of (system info)
+	set logText to TotalQty & tab & OrderNumber & tab & StartTime & tab & FinishTime & tab & timeDiff & tab & thisUsername as string
+	set logFile to "MERGE CENTRAL:FIP AUTOMATION:Logs:FIP Automation Log.txt"
+
+	logToFile(logText,logFile)
 	
 	--moves merged excel doc into merged folder
 	
