@@ -48,15 +48,6 @@ try
 	
 	tell application "Finder"
 		
-		--checks for old job in HOM Calendars 2006; copies if found
-		if exists "HOM_Shortrun:HOM Calendars 2006:" & OldJN then
-			duplicate "HOM_Shortrun:HOM Calendars 2006:" & OldJN to NewPth
-			
-			--checks if _1 is appended to end of folder name in 2006 calendars
-		else if exists "HOM_Shortrun:HOM Calendars 2006:" & OldJN & "_1" then
-			duplicate "HOM_Shortrun:HOM Calendars 2006:" & OldJN & "_1" to NewPth
-			
-			
 			--checks for old job in HOM Calendars PRINTED; copies if found
 		else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & OldJN then
 			duplicate "HOM_Shortrun:HOM Calendars PRINTED:" & OldJN to NewPth
