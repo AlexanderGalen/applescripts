@@ -78,11 +78,16 @@ end repeat
 --actually works on the orders
 repeat with TheItem in filelist
 	
-	set StartTime to characters 1 through 8 of time string of (current date) as text
+	set timeString to time string of (current date) as string
+	if length of timeString is 11 then
+		set StartTime to characters 1 thru 8 of timeString as string
+	else
+		set StartTime to "0" & characters 1 thru 7 of timeString as string
+	end if
+	
 	set startSeconds to time of (current date)
 	
 	set ExitVar to ""
-	
 	
 	tell application "Finder"
 		set {name:FileName, name extension:fileExtension} to TheItem
@@ -227,19 +232,25 @@ repeat with TheItem in filelist
 		end tell
 	end timeout
 	
-	
-	set FinishTime to characters 1 through 8 of time string of (current date) as text
+	set timeString to time string of (current date) as string
+	if length of timeString is 11 then
+		set FinishTime to characters 1 thru 8 of timeString as string
+	else
+		set FinishTime to "0" & characters 1 thru 7 of timeString as string
+	end if
+
 	set endSeconds to time of (current date)
 	
 	set secondDiff to endSeconds - startSeconds
-	set timeDiff to format (secondDiff / 60) into "00.00"
+	set timeDiff to format (secondDiff / 60) into "000.00"
+	set TotalQty to format TotalQty into "000"
 	
 	--opens the logs and inputs this job's info at the end of the log
 	set thisUsername to short user name of (system info)
 	set logText to TotalQty & tab & OrderNumber & tab & StartTime & tab & FinishTime & tab & timeDiff & tab & thisUsername as string
-	set logFile to "MERGE CENTRAL:FIP AUTOMATION:Logs:FIP Automation Log.txt"
-
-	logToFile(logText,logFile)
+	set LogFile to "MERGE CENTRAL:FIP AUTOMATION:Logs:FIP Automation Log.txt"
+	
+	logToFile(logText, LogFile)
 	
 	--moves merged excel doc into merged folder
 	
