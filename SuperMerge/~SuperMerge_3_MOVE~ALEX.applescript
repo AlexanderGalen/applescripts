@@ -245,7 +245,7 @@ repeat while ExitVariable is not "Exit"
 				cp_all(thisSource, thisJobFolder)
 			end if
 		on error errStr number errorNumber
-			set logText to (current date) & tab & jobnumber & tab & tab & prevJob & tab &  errStr & tab & errorNumber as text
+			set logText to (current date) & tab & jobnumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
 		end try
 		
@@ -325,7 +325,7 @@ rm_all(imagesToProcessFolder)
 
 --displays a dialog to alert user if there were any errors, or exit cleanly if not
 
-if errorsOccured
+if errorOccured then
 	tell application "Microsoft Excel"
 		open file "HOM_Shortrun:Merge Error Log.txt"
 	end tell
