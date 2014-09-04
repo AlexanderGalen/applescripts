@@ -49,7 +49,7 @@ try
 	tell application "Finder"
 		
 			--checks for old job in HOM Calendars PRINTED; copies if found
-		else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & OldJN then
+		if exists "HOM_Shortrun:HOM Calendars PRINTED:" & OldJN then
 			duplicate "HOM_Shortrun:HOM Calendars PRINTED:" & OldJN to NewPth
 			
 			--checks if _1 is appended to end of folder name in HOM Calendars PRINTED
