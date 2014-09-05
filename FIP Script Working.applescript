@@ -109,7 +109,7 @@ repeat with TheItem in filelist
 	end tell
 	
 	--compiles the finished file name from info in the excel doc
-	set FinishedFilePath to "MERGE CENTRAL:FIP AUTOMATION:~~~Orders:FIP_" & OrderNumber & "." & ClientName & ".pdf"
+	set finishedFilePath to "MERGE CENTRAL:FIP AUTOMATION:~~~Orders:FIP_" & OrderNumber & "." & ClientName & ".pdf"
 	
 	--Makes Coverpage in Quark with Order Number and Client Name
 	
@@ -129,7 +129,7 @@ repeat with TheItem in filelist
 		close every document
 		open file "MERGE CENTRAL:FIP AUTOMATION:CoverSheet:Cover.pdf"
 		tell document 1
-			save to file FinishedFilePath
+			save to file finishedFilePath
 		end tell
 	end tell
 	
@@ -163,26 +163,6 @@ repeat with TheItem in filelist
 						set YearFileName to value of column 4
 						set FileName to "FIP_" & YearFileName as string
 						set pathtopdf to "MERGE CENTRAL:FIP AUTOMATION:Found Image Press Calendars:" & FileName as string
-						
-						--checks that the pdf exists. displays dialog if it is not found.
-						tell application "Finder"
-							if not (exists pathtopdf) then
-								tell application "System Events"
-									set dialogvar to display dialog "PDF (" & pathtopdf & ") was not found. Check File Name" buttons {"Skip Row", "Try Anyway"} default button 1
-								end tell
-								
-								
-								if button returned of dialogvar is "Skip Row" then
-									
-									--exits just the inner loop, skipping over current row.
-									set RowNumber to RowNumber + 1
-									exit repeat
-									
-								end if
-							end if
-						end tell
-						
-						
 						
 						--gets number of pages in each open pdf
 						
@@ -227,7 +207,7 @@ repeat with TheItem in filelist
 	
 	with timeout of 86400 seconds
 		tell application "Adobe Acrobat Pro"
-			save document 1 to FinishedFilePath
+			save document 1 to finishedFilePath
 			close document 1
 		end tell
 	end timeout
@@ -238,7 +218,7 @@ repeat with TheItem in filelist
 	else
 		set FinishTime to "0" & characters 1 thru 7 of timeString as string
 	end if
-
+	
 	set endSeconds to time of (current date)
 	
 	set secondDiff to endSeconds - startSeconds
