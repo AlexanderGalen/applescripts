@@ -12,13 +12,13 @@ set copyvar to true
 --also checks for _1 after job number and corrects accordingly
 
 tell application "Finder"
-	set userSelection to selection as text
+	set userSelection to selection as string
 end tell
-set ActiveJobFolder to characters 1 through 36 of userSelection & ":" as text
+set ActiveJobFolder to characters 1 through 36 of userSelection & ":" as string
 tell application "Finder"
 	if exists ActiveJobFolder then
 	else
-		set ActiveJobFolder to characters 1 through 36 of userSelection & "_1:" as text
+		set ActiveJobFolder to characters 1 through 36 of userSelection & "_1:" as string
 	end if
 end tell
 
@@ -109,10 +109,12 @@ try
 	
 	
 	--displays a dialog saying the thing didnt work
-on error
+on error errStr number errorNumber
+
 	tell application "System Events"
-		display dialog "Could Not Copy Folder"
+		display dialog "Could Not Copy Folder\n" & errStr & " " & errorNumber
 		activate
+		return "script exited because it encountered an error"
 	end tell
 	
 end try

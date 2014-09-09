@@ -9,16 +9,12 @@ set NewPth to "HOM_Shortrun:~HOM Active Jobs:" & NewJN as string
 
 --Makes a new folder in active jobs for the current job, and opens a new finder window displaying it
 tell application "Finder"
-	if not (exists "HOM_Shortrun:~HOM Active Jobs:" & NewJN & ":") then
-		try
-			make new folder at folder "HOM_Shortrun:~HOM Active Jobs:" with properties {name:NewJN}
-		on error
-			tell application "System Events"
-				display dialog "Could not make new folder. Script is exiting"
-			end tell
-			return "script exited because it encountered an error"
-		end try
-	end if
+	try
+		make new folder at folder "HOM_Shortrun:~HOM Active Jobs:" with properties {name:NewJN}
+	on error errStr number errorNumber
+		display dialog "Could not make new folder\n" & errStr & " " & errorNumber
+		return "script exited because it encountered an error"
+	end try
 	set jobFolder to "HOM_Shortrun:~HOM Active Jobs:" & NewJN & ":"
 	set NewWindow to make new Finder window
 	set properties of NewWindow to {target:jobFolder, position:{-635, 78}, bounds:{-635, 78, 0, 568}, current view:column view, sidebar width:205}
@@ -91,12 +87,12 @@ try
 	end tell
 	
 	--if even that fails, Displays a Dialog stating that the script failed
-on error
+on error errStr number errorNumber
 	
 	tell application "System Events"
-		display dialog "Could Not Copy Folder"
+		display dialog "Could Not Copy Folder\n" & errStr & " " & errorNumber
 		activate
-		return
+		return "script exited because it encountered an error"
 	end tell
 	
 end try
