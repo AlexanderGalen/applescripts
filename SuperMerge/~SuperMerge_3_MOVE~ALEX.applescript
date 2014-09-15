@@ -61,7 +61,7 @@ repeat while ExitVariable is not "Exit"
 		tell application "Microsoft Excel"
 			tell row i
 				set imageNames to {value of cell 13, value of cell 14, value of cell 15, value of cell 16, value of cell 29, value of cell 30, value of cell 31, value of cell 32, value of cell 33}
-				set jobnumber to string value of cell 1
+				set jobNumber to string value of cell 1
 				set quarkName to string value of cell 1 & ".HOM.qxp"
 				set prevArt to string value of cell 34
 				set prevInfo to string value of cell 35
@@ -70,20 +70,20 @@ repeat while ExitVariable is not "Exit"
 		
 		--sets variables specific to this row
 		set thisQuarkDoc to mergedQuarkDocsFolder & quarkName as string
-		set thisJobFolder to activeJobsFolder & jobnumber as string
+		set thisJobFolder to activeJobsFolder & jobNumber as string
 		
 		--does a full exit if it finds no value for job number in database: when it reaches the end of the database
 		--the check for 0 is because excel was returning 0 as the value for an empty cell and I don't know why
 		
-		if jobnumber is "" or jobnumber is 0 then
+		if jobNumber is "" or jobNumber is 0 then
 			set ExitVariable to "Exit"
 			exit repeat
 		end if
 		
 		
 		tell application "Finder"
-			if not (exists folder jobnumber of folder activeJobsFolder) then
-				make new folder at folder activeJobsFolder with properties {name:jobnumber}
+			if not (exists folder jobNumber of folder activeJobsFolder) then
+				make new folder at folder activeJobsFolder with properties {name:jobNumber}
 			end if
 		end tell
 		
@@ -245,7 +245,7 @@ repeat while ExitVariable is not "Exit"
 				cp_all(thisSource, thisJobFolder)
 			end if
 		on error errStr number errorNumber
-			set logText to (current date) & tab & jobnumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
+			set logText to (current date) & tab & jobNumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
 		end try
 		
@@ -266,7 +266,7 @@ repeat while ExitVariable is not "Exit"
 				try
 					cp(thisImagePath, thisJobFolder)
 				on error errStr number errorNumber
-					set logText to (current date) & tab & jobnumber & tab & thisImage & tab & tab & errStr & tab & errorNumber as text
+					set logText to (current date) & tab & jobNumber & tab & thisImage & tab & tab & errStr & tab & errorNumber as text
 					logToFile(logText, LogFile)
 				end try
 			end if
@@ -285,18 +285,18 @@ repeat while ExitVariable is not "Exit"
 	tell application "Microsoft Excel"
 		tell row i
 			set imageNames to {value of cell 13, value of cell 14, value of cell 15, value of cell 16, value of cell 29, value of cell 30, value of cell 31, value of cell 32, value of cell 33}
-			set jobnumber to string value of cell 1
+			set jobNumber to string value of cell 1
 			set quarkName to string value of cell 1 & ".HOM.qxp"
 		end tell
 	end tell
-	if jobnumber is "" then exit repeat
+	if jobNumber is "" then exit repeat
 	
 	repeat with thisImage in imageNames
 		
 		--sets variable specific to this row
 		if contents of thisImage is not "" then
 			tell application "Finder"
-				if (exists file thisImage of folder jobnumber of folder activeJobsFolder) then
+				if (exists file thisImage of folder jobNumber of folder activeJobsFolder) then
 					set fileToDelete to clientImagesFolder & thisImage as string
 				else
 					set fileToDelete to ""
