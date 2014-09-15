@@ -9,7 +9,12 @@ set thisQuarkDoc to activeJobs & jobNumber & ":" & jobNumber & ".1up.print.qxp"
 
 tell application "QuarkXPress"
 	set theSelection to selection
-	set grouped of theSelection to true
+	if class of theSelection is group box then
+		set grouped of theSelection to true
+		set isGroupBox to true
+	else
+		set isGroupBox to false
+	end if
 	copy theSelection
 	set {y1, x1, y2, x2} to bounds of theSelection as list
 	set x1 to (coerce x1 to real)
@@ -37,8 +42,13 @@ tell application "QuarkXPress"
 	tell document 1
 		activate
 		paste
-		set bounds of group box 1 to {0, 0, 2.25, 4}
-		--print print output style "Proof"
+		if isGroupBox then
+			set bounds of group box 1 to {0, 0, 2.25, 4}
+		else
+			set bounds of picture box 1 to {0, 0, 2.25, 4}
+		end if
+		
+		print print output style "Proof"
 	end tell
 	
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"
