@@ -1,13 +1,7 @@
 tell application "Finder"
 	
-	
-	--set source_folder to "HOM:PRODUCTS:CALENDARS:2015 CALENDARS:2015 Custom Calendars:BU:" as alias
-	
-	--set source_folder to "HOM:PRODUCTS:CALENDARS:2015 CALENDARS:2015 Custom Calendars:EX:" as alias
-	
-	--set source_folder to "HOM:PRODUCTS:CALENDARS:2015 CALENDARS:2015 Custom Calendars:FC:" as alias
-	
-	set source_folder to "HOM:PRODUCTS:CALENDARS:2015 CALENDARS:2015 Custom Calendars:JU:" as alias
+	set productSize to "JU"
+	set source_folder to "HOM:PRODUCTS:CALENDARS:2015 CALENDARS:W2P working:" & productSize & ":" as alias
 	
 	
 	set File_List to (files of entire contents of source_folder) as alias list
@@ -36,9 +30,9 @@ tell application "Finder"
 			
 			
 			if theOrientation is "Vertical" then
-				set theTextDoc to "Macintosh HD:USers:maggie:desktop:CAJUV.txt"
+				set theTextDoc to "Macintosh HD:USers:maggie:desktop:CA" & productSize & "V.txt"
 			else
-				set theTextDoc to "Macintosh HD:USers:maggie:desktop:CAJUH.txt"
+				set theTextDoc to "Macintosh HD:USers:maggie:desktop:CA" & productSize & "H.txt"
 			end if
 			
 			open for access file theTextDoc with write permission
