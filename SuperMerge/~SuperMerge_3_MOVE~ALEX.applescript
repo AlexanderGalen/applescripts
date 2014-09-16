@@ -4,14 +4,9 @@ property firstRow : 2
 --copy functions will replace existing files
 
 on cp_all(source, destination)
-	tell application "Finder"
-		set theFiles to entire contents of folder source as alias list
-	end tell
-	if theFiles is not {} then
-		set source to quoted form of POSIX path of source
-		set destination to quoted form of POSIX path of destination
-		do shell script "cp -Rpf " & source & "* " & destination
-	end if
+	set source to quoted form of POSIX path of source
+	set destination to quoted form of POSIX path of destination
+	do shell script "cp -Rpf " & source & "* " & destination
 end cp_all
 
 on cp(source, destination)
@@ -88,57 +83,39 @@ repeat while ExitVariable is not "Exit"
 		end tell
 		
 		cp(thisQuarkDoc, thisJobFolder)
+		
 		if prevArt is not "" then
 			try
 				set prevJob to find text "[0-9]{6}" in prevArt with regexp and string result
 				set skipvar to false
-			on error
+				set textToLog to false
+			on error errStr number errorNumber
+				set textToLog to true
+				set logText to (current date) & tab & jobNumber & tab & tab & tab & errStr & tab & errorNumber as text
 				set skipvar to true
 			end try
 		else if prevInfo is not "" then
 			try
-				set prevJob to find text "[0-9]{6}" in prevArt with regexp and string result
+				set prevJob to find text "[0-9]{6}" in prevInfo with regexp and string result
 				set skipvar to false
-			on error
+				set textToLog to false
+			on error errStr number errorNumber
+				set textToLog to true
+				set logText to (current date) & tab & jobNumber & tab & tab & tab & errStr & tab & errorNumber as text
 				set skipvar to true
 			end try
+		else
+			set skipvar to true
+			set textToLog to false
 		end if
-		
-		--checking values of prev info/art cells; skips copying if they are different values or both empty
-		--sets value of prevJob if they are the same or only one has a value
-		--its kinda wonky but I know whats going on
-		
 		
 		--skips over copying old job if the result of value check determines that it should be skipped
 		
+		if textToLog then
+			logToFile(logText, LogFile)
+		end if
+		
 		if skipvar then
-			exit repeat
-		end if
-		
-		
-		--this if block checks the length of prevJob from the database, strips HOM from the beginning if it is there, or allows the user
-		--to input the previous Job number manually if it is an unsual length
-		
-		
-		if length of prevJob is 9 then
-			set prevJob to characters 4 thru 9 of prevJob as string
-			
-			--if the length of prevJob is not 6 or 9, asks user to enter previous job number manually
-		else if length of prevJob is not 6 then
-			--previous job number is not 6 or 9 characters long. Script does not yet have a way to deduce a usable job number from this yet. Skips copying this job.
-			set skipvar to "Skip"
-		end if
-		
-		--an error check to make sure prevJob is an integer
-		try
-			set prevJob to prevJob as integer
-		on error
-			--prevJob cannot be coerced into an integer. Likely contains alpha characters. Script does not yet have a way to deduc a usable job number from this. Skips copying this job.
-			set skipvar to "Skip"
-		end try
-		
-		--if script was unable to get a usable previous job number, skips copying the previous job.
-		if skipvar is "Skip" then
 			exit repeat
 		end if
 		
@@ -209,19 +186,18 @@ repeat while ExitVariable is not "Exit"
 					set Chars to characters of prevJob
 					set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
 					set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & First3 & "xxx.jobs:"
-					set thisSource to OldPth & prevJob
+					set FinishedArchivePath to OldPth & prevJob
 					
 				end if
 			end tell
 			
 			--duplicates whichever path was found to exist into the Active Job Folder
-			if copyvar is true then
+			if copyvar then
 				cp(FinishedOldPath, thisJobFolder)
 			else
-				-- shell script that finds and copies old job folder to new one
-				--this will only happen if old job was in archives
-				cp_all(thisSource, thisJobFolder)
+				cp_all(FinishedArchivePath, thisJobFolder)
 			end if
+			
 		on error errStr number errorNumber
 			set logText to (current date) & tab & jobNumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
@@ -296,10 +272,28 @@ end tell
 set originalImagesFolder to "HOM_Shortrun:SUPERmergeOUT:Original Client Images:"
 set pdfsToProcessFolder to "HOM_Shortrun:PDFs to process:"
 set imagesToProcessFolder to "HOM_Shortrun:Process Client Images:"
-cp_all(pdfsToProcessFolder, originalImagesFolder)
-rm_all(pdfsToProcessFolder)
-cp_all(imagesToProcessFolder, originalImagesFolder)
-rm_all(imagesToProcessFolder)
+try
+	cp_all(pdfsToProcessFolder, originalImagesFolder)
+on error
+	set clearFail to true
+end try
+try
+	rm_all(pdfsToProcessFolder)
+on error
+	set clearFail to true
+end try
+try
+	cp_all(imagesToProcessFolder, originalImagesFolder)
+on error
+	set clearFail to true
+end try
+try
+	rm_all(imagesToProcessFolder)
+on error
+	set clearFail to true
+end try
+
+
 
 --displays a dialog to alert user if there were any errors, or exit cleanly if not
 
@@ -308,4 +302,8 @@ if errorOccured then
 		open file "HOM_Shortrun:Merge Error Log.txt"
 	end tell
 	display dialog "Some jobs did not process correctly"
+end if
+
+if clearFail then
+	display dialog "Process image folders may not have been cleared out successfully"
 end if
