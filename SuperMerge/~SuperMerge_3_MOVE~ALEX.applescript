@@ -88,52 +88,30 @@ repeat while ExitVariable is not "Exit"
 		end tell
 		
 		cp(thisQuarkDoc, thisJobFolder)
-		
+		if prevArt is not "" then
+			try
+				set prevJob to find text "[0-9]{6}" in prevArt with regexp and string result
+				set skipvar to false
+			on error
+				set skipvar to true
+			end try
+		else if prevInfo is not "" then
+			try
+				set prevJob to find text "[0-9]{6}" in prevArt with regexp and string result
+				set skipvar to false
+			on error
+				set skipvar to true
+			end try
+		end if
 		
 		--checking values of prev info/art cells; skips copying if they are different values or both empty
 		--sets value of prevJob if they are the same or only one has a value
 		--its kinda wonky but I know whats going on
 		
 		
-		set prevJob to ""
-		set skipvar to ""
-		
-		
-		if prevArt is "" and prevInfo is "" then
-			--both blank; skip old job folder copy
-			set skipvar to "Skip"
-		else
-			set prevjobstatus to "Not Both Blank"
-			if prevArt is "" or prevInfo is "" then
-				--one blank; set whichever is not blank to prevJob
-				if prevArt is "" then
-					set prevJob to prevInfo
-					set skipvar to "NoSkip"
-				else
-					set prevJob to prevArt
-					set skipvar to "NoSkip"
-				end if
-			else
-				--neither blank; check values to see if they are the same
-				if prevArt is not prevInfo then
-					--neither blank; different values. skip old job folder copy
-					set skipvar to "Skip"
-				else
-					--neither blank; identical values. set value to prevJob
-					set prevJob to prevArt
-					set skipvar to "NoSkip"
-				end if
-			end if
-		end if
-		
-		--checks if value of Prevjob is the default value, meaning the customer accidentally entered a useless value. also skips copying for group orders, except for the first one.
-		if prevJob is "Enter previous order number" then
-			set skipvar to "skip"
-		end if
-		
 		--skips over copying old job if the result of value check determines that it should be skipped
 		
-		if skipvar is "Skip" then
+		if skipvar then
 			exit repeat
 		end if
 		
