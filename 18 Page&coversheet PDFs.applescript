@@ -1,20 +1,20 @@
 tell application "Finder"
-	set theFile to "hom:products:note card cafe:sets a6:â€¢ A6.SingleCards.New Size:Holiday Backup:NCNYH6-00003.Almost Midnight.pdf" as alias
-	set coverSheet to "hom:products:note card cafe:sets a6:â€¢ A6.SingleCards.New Size:Coversheet:A6 Coversheet Template.qxp" as alias
-	set finishedCoverSheet to "HOM:PRODUCTS:NOTE CARD CAFE:SETS A6:â€¢ A6.SingleCards.New Size:Coversheet:coverSheet.pdf"
+	set theFile to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:NonHoliday:NCRTH6-00006.A Rustic Thanks.pdf" as alias
+	set coverSheet to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Coversheet:A6 Coversheet Template.qxp" as alias
+	set finishedCoverSheet to "HOM:PRODUCTS:NOTE CARD CAFE:SETS A6:¥ A6.SingleCards.New Size:Coversheet:coverSheet.pdf"
 	set theName to name of theFile
 	set theLength to length of theName
 	set productCode to characters 1 thru 12 of theName as string
 	set productName to characters 14 thru (theLength - 4) of theName as string
 	set finishedFileName to "A6.36singles." & productCode & "." & productName & ".pdf"
-	set finishedFilePath to "hom:products:note card cafe:sets a6:â€¢ A6.SingleCards.New Size:Holiday:" & finishedFileName
+	set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Non Holiday 19 Page files:" & finishedFileName
 	set coverText to productCode & return & productName
 end tell
 
 
 set coverSheet to coverSheet as string
 tell application "QuarkXPress"
-	open file coverSheet 
+	open file coverSheet
 	tell document 1
 		set text of text box 1 to coverText
 	end tell
@@ -36,6 +36,6 @@ tell application "Adobe Acrobat Pro"
 	close document 1
 end tell
 
-tell application "Finder"	
+tell application "Finder"
 	delete finishedCoverSheet
 end tell
