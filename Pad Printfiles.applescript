@@ -1,13 +1,18 @@
-tell application "Keyboard Maestro Engine"
-	set tempvar to make variable with properties {name:"Job Number"}
-	set jobNumber to value of tempvar
-end tell
-set activeJobs to "HOM_Shortrun:~HOM Active Jobs:"
-set thisPrintFile to activeJobs & jobNumber & ":" & jobNumber & ".printfile.pdf"
-set thisQuarkDoc to activeJobs & jobNumber & ":" & jobNumber & ".1up.print.qxp"
-
-
 tell application "QuarkXPress"
+	if file path of document 1 is null then
+		set isSaved to false
+		set jobNumber to display dialog "Input Job Number Please" default answer ""
+	else
+		set isSaved to true
+		set thisName to name of document 1 as string
+		set jobNumber to name of document 1
+		set jobNumber to find text "[0-9]{6}" in jobNumber with regexp and string result
+	end if
+
+	set activeJobs to "HOM_Shortrun:~HOM Active Jobs:"
+	set thisPrintFile to activeJobs & jobNumber & ":" & jobNumber & ".printfile.pdf"
+	set thisQuarkDoc to activeJobs & jobNumber & ":" & jobNumber & ".1up.print.qxp"
+
 	set theSelection to selection
 	if class of theSelection is group box then
 		set grouped of theSelection to true
@@ -22,33 +27,42 @@ tell application "QuarkXPress"
 	set theWidth to (round (x2 - x1) * 100) / 100
 	
 	set impositionTemplatesPath to "Resource:Templates:Shortrun Templates.New:X.Igen.SR Templates:"
-	set templatesPath to "Macintosh HD:Users:maggie:Local Templates:Calendars:P&P Pads:"
 	
 	if theWidth is 4 then
 		set product to "CHCP"
 		set impositionTemplate to impositionTemplatesPath & "~CHCP.HouseShape CalendarPads:CHCP.House_28up Layout.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CHCP.print.pdf"
-		set thisTemplate to templatesPath & "CHCP.qxp"
+		set newDocProperties to {page height:«data FXVM0000A200», page width:«data FXHM00002001»}
 	else if theWidth is 3.75 then
 		set product to "CCCP"
 		set impositionTemplate to impositionTemplatesPath & "~CCP:CCP.Print.30up.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CCCP.print.pdf"
-		set thisTemplate to templatesPath & "CCCP.qxp"
+		set newDocProperties to {page height:«data FXVM0000A200», page width:«data FXHM00000E01»}
 	else
-		return "Sizing Incorrect"
+		return "Sizing is neither a CCCP or CHCP"
 	end if
+	
 	close document 1 without saving
-	open file thisTemplate
+	make new document with properties newDocProperties
+	
 	tell document 1
 		activate
 		paste
 		if isGroupBox then
-			set bounds of group box 1 to {0, 0, 2.25, 4}
+			if product is "CCCP" then
+				set bounds of group box 1 to {0, 0, 2.25, 3.75}
+			else
+				set bounds of group box 1 to {0, 0, 2.25, 4}
+			end if
 		else
-			set bounds of picture box 1 to {0, 0, 2.25, 4}
+			if product is "CCCP" then
+				set bounds of picture box 1 to {0, 0, 2.25, 3.75}
+			else
+				set bounds of picture box 1 to {0, 0, 2.25, 4}
+			end if
 		end if
 		
-		print print output style "Proof"
+		--print print output style "Proof"
 	end tell
 	
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"
