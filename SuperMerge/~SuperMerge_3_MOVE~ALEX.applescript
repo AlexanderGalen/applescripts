@@ -274,21 +274,25 @@ set pdfsToProcessFolder to "HOM_Shortrun:PDFs to process:"
 set imagesToProcessFolder to "HOM_Shortrun:Process Client Images:"
 try
 	cp_all(pdfsToProcessFolder, originalImagesFolder)
+	set clearFail to false
 on error
 	set clearFail to true
 end try
 try
 	rm_all(pdfsToProcessFolder)
+	set clearFail to false
 on error
 	set clearFail to true
 end try
 try
 	cp_all(imagesToProcessFolder, originalImagesFolder)
+	set clearFail to false
 on error
 	set clearFail to true
 end try
 try
 	rm_all(imagesToProcessFolder)
+	set clearFail to false
 on error
 	set clearFail to true
 end try
