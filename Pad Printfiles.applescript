@@ -1,18 +1,15 @@
 tell application "QuarkXPress"
-	if file path of document 1 is null then
-		set isSaved to false
-		set jobNumber to display dialog "Input Job Number Please" default answer ""
-	else
-		set isSaved to true
-		set thisName to name of document 1 as string
-		set jobNumber to name of document 1
-		set jobNumber to find text "[0-9]{6}" in jobNumber with regexp and string result
-	end if
-
+	set theName to name of document 1 as string
+	try
+		set jobNumber to find text "[0-9]{6}" in theName with regexp and string result
+	on error
+		set jobNumber to text returned of (display dialog "Input Job Number Please" default answer "")
+	end try
+	
 	set activeJobs to "HOM_Shortrun:~HOM Active Jobs:"
 	set thisPrintFile to activeJobs & jobNumber & ":" & jobNumber & ".printfile.pdf"
 	set thisQuarkDoc to activeJobs & jobNumber & ":" & jobNumber & ".1up.print.qxp"
-
+	
 	set theSelection to selection
 	if class of theSelection is group box then
 		set grouped of theSelection to true
@@ -32,12 +29,12 @@ tell application "QuarkXPress"
 		set product to "CHCP"
 		set impositionTemplate to impositionTemplatesPath & "~CHCP.HouseShape CalendarPads:CHCP.House_28up Layout.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CHCP.print.pdf"
-		set newDocProperties to {page height:Â«data FXVM0000A200Â», page width:Â«data FXHM00002001Â»}
+		set newDocProperties to {page height:Çdata FXVM0000A200È, page width:Çdata FXHM00002001È}
 	else if theWidth is 3.75 then
 		set product to "CCCP"
 		set impositionTemplate to impositionTemplatesPath & "~CCP:CCP.Print.30up.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CCCP.print.pdf"
-		set newDocProperties to {page height:Â«data FXVM0000A200Â», page width:Â«data FXHM00000E01Â»}
+		set newDocProperties to {page height:Çdata FXVM0000A200È, page width:Çdata FXHM00000E01È}
 	else
 		return "Sizing is neither a CCCP or CHCP"
 	end if

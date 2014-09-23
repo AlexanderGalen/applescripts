@@ -1,4 +1,31 @@
---declares the log to file function
+--declares the log to file function and the read excel doc function
+
+--returns a list of all data in excel file
+--format is: each item of first list is a line from original document, each item of that list is a cell from that line
+on readExcelDoc(thisFile)
+	
+	set tempFile to (path to desktop) & ":temp.txt" as string
+	
+	tell application "Microsoft Excel"
+		open thisFile
+		save as active sheet of active workbook filename tempFile file format text Mac file format with overwrite
+		close active workbook saving no
+	end tell
+	
+	set theData to read alias tempFile using delimiter return
+	set tableData to {}
+	set text item delimiters to tab
+	repeat with i from 1 to count of theData
+		set theLine to text items of item i of theData
+		copy theLine to the end of tableData
+	end repeat
+	set text item delimiters to ""
+	do shell script "rm -f " & quoted form of POSIX path of tempFile
+	return tableData
+	
+end readExcelDoc
+
+
 on logToFile(logText, LogFile)
 	set errorOccured to false
 	open for access file LogFile with write permission
@@ -10,6 +37,8 @@ end logToFile
 tell application "Finder"
 	set filelist to files of folder POSIX file "/Volumes/MERGE CENTRAL/FIP AUTOMATION/Hot Folder/" as alias list
 end tell
+
+
 
 tell application "Microsoft Excel"
 	open
@@ -25,53 +54,31 @@ repeat with TheItem in filelist
 		set ExcelDoc to TheItem
 	end tell
 	
-	set RowNumber to 2
+	--gets contents of excel document with predefined readExcelDoc function
+	set theData to readExcelDoc(ExcelDoc)
 	
-	tell application "Microsoft Excel"
-		open ExcelDoc
-	end tell
+	set rowCount to count of theData
 	
-	repeat while ExitVar is not "Exit"
-		repeat 1 times
-			tell application "Microsoft Excel"
-				tell row RowNumber
-					if value of column 1 is "TOTAL" then
-						--performs a full exit
-						set ExitVar to "Exit"
-						exit repeat
-					end if
-					
-					set Column3Value to value of column 3
-					
-					--if there is a value in the quantity column, starts process of adding pages
-					
-					if Column3Value is not "" then
-						set YearFileName to value of column 4
-						set FileName to "FIP_" & YearFileName as string
-						set pathtopdf to "MERGE CENTRAL:FIP AUTOMATION:Found Image Press Calendars:" & FileName as string
-						
-						tell application "Finder"
-							set fileExists to exists of pathtopdf
-						end tell
-						
-						if not fileExists then
-							tell application "Microsoft Excel"
-								set excelName to name of document 1
-							end tell
-							display dialog FileName & " of Excel Document " & excelName & " was not found."
-						end if
-						
-					end if
-					
-					set RowNumber to RowNumber + 1
-				end tell
+	--loops through all "rows" of the data
+	repeat with i from 2 to rowCount - 2
+		set thisQTY to item 3 of item i of theData
+		
+		if thisQTY is not "" then
+			set YearFileName to item 4 of item i of theData
+			set FileName to "FIP_" & YearFileName as string
+			set pathtopdf to "MERGE CENTRAL:FIP AUTOMATION:Found Image Press Calendars:" & FileName as string
+			
+			tell application "Finder"
+				set fileExists to exists of pathtopdf
 			end tell
-		end repeat
+			
+			if not fileExists then
+				set ExcelName to ExcelDoc
+				display dialog FileName & " of Excel Document " & ExcelName & " was not found."
+			end if
+			
+		end if
 	end repeat
-	set ExitVar to ""
-	tell application "Microsoft Excel"
-		close active workbook without saving
-	end tell
 end repeat
 
 
@@ -94,21 +101,14 @@ repeat with TheItem in filelist
 		set ExcelDoc to TheItem
 	end tell
 	
-	set RowNumber to 2
+	set theData to readExcelDoc(ExcelDoc)
+	set rowCount to count of theData
 	
-	tell application "Microsoft Excel"
-		
-		open ExcelDoc
-		
-		--gets order info from excel doc and intitializes some variables
-		
-		set OrderNumber to string value of column 1 of row 2
-		set ClientName to string value of column 2 of row 2
-		set Column3Value to ""
-		
-	end tell
+	set OrderNumber to item 1 of item 2 of theData
+	set ClientName to item 2 of item 2 of theData
+	set thisQTY to ""
 	
-	--compiles the finished file name from info in the excel doc
+	--compiles the finished file name from info in the data
 	set finishedFilePath to "MERGE CENTRAL:FIP AUTOMATION:~~~Orders:FIP_" & OrderNumber & "." & ClientName & ".pdf"
 	
 	--Makes Coverpage in Quark with Order Number and Client Name
@@ -138,73 +138,48 @@ repeat with TheItem in filelist
 	end tell
 	
 	--checks for value of quantity column, row by row, until the row with "TOTAL" in the first column, which should be the final row.
-	
-	
-	repeat while ExitVar is not "Exit"
-		repeat 1 times
-			tell application "Microsoft Excel"
-				tell row RowNumber
-					if value of column 1 is "TOTAL" then
-						set TotalQty to value of column 3
-						--performs a full exit
-						set ExitVar to "Exit"
-						exit repeat
-					end if
-					
-					set Column3Value to value of column 3
-					
-					--if there is a value in the quantity column, starts process of adding pages
-					
-					if Column3Value is not "" then
-						set Qty to (Column3Value / 6)
-						
-						--gets the name of the pdf and sets the path to it as a variable
-						
-						set YearFileName to value of column 4
-						set FileName to "FIP_" & YearFileName as string
-						set pathtopdf to "MERGE CENTRAL:FIP AUTOMATION:Found Image Press Calendars:" & FileName as string
-						
-						--gets number of pages in each open pdf
-						
-						tell application "Adobe Acrobat Pro"
-							tell document 1
-								set Doc1PageQty to count pages
-							end tell
-							open pathtopdf
-							tell document 2
-								set Doc2PageQty to count pages
-							end tell
-							
-							--adds the pages from second document to first document after last page; repeats for however many of that calendar they ordered
-							
-							with timeout of 86400 seconds
-								repeat Qty times
-									insert pages document 1 after Doc1PageQty from document 2 starting with 1 number of pages Doc2PageQty
-									tell document 1
-										set Doc1PageQty to count pages
-									end tell
-								end repeat
-							end timeout
-							close document 2
-						end tell
-						set RowNumber to RowNumber + 1
-					else
-						set RowNumber to RowNumber + 1
-					end if
+	set TotalQty to item 3 of item rowCount of theData
+	repeat with i from 2 to rowCount - 2
+		
+		set thisQTY to item 3 of item i of theData
+		
+		--if there is a value in the quantity column, starts process of adding pages
+		
+		if thisQTY is not "" then
+			set trueQTY to (thisQTY / 6)
+			
+			--gets the name of the pdf and sets the path to it as a variable
+			set YearFileName to item 4 of item i of theData
+			set FileName to "FIP_" & YearFileName as string
+			set pathtopdf to "MERGE CENTRAL:FIP AUTOMATION:Found Image Press Calendars:" & FileName as string
+			
+			--gets number of pages in each open pdf
+			tell application "Adobe Acrobat Pro"
+				tell document 1
+					set Doc1PageQty to count pages
 				end tell
+				open pathtopdf
+				tell document 2
+					set Doc2PageQty to count pages
+				end tell
+				
+				--adds the pages from second document to first document after last page; repeats for however many of that calendar they ordered
+				with timeout of 86400 seconds
+					repeat trueQTY times
+						insert pages document 1 after Doc1PageQty from document 2 starting with 1 number of pages Doc2PageQty
+						tell document 1
+							set Doc1PageQty to count pages
+						end tell
+					end repeat
+				end timeout
+				close document 2
 			end tell
-		end repeat
+			
+			--if qty is 0, continue to next row.
+		end if
 	end repeat
-	set ExitVar to ""
-	
-	--closes the excel document without saving
-	
-	tell application "Microsoft Excel"
-		close active workbook saving no
-	end tell
 	
 	--saves changes made to new PDF
-	
 	with timeout of 86400 seconds
 		tell application "Adobe Acrobat Pro"
 			save document 1 to finishedFilePath

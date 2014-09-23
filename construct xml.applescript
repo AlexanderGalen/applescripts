@@ -15,6 +15,7 @@ tell application "Microsoft Excel"
 end tell
 
 set coverText to "FIP_" & orderNumber & " " & clientName
+set finishedPDF to FIPAutomation & "~~~Orders:FIP_" & orderNumber & "." & clientName & ".pdf"
 
 
 set finishedXML to finishedXML & "<?xml version='1.0' encoding='UTF-8'?>

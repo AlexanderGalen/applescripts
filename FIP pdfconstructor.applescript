@@ -9,7 +9,7 @@ on logToFile(logText, LogFile)
 end logToFile
 
 --gets contents of hot folder
-tell application "Findcer"
+tell application "Finder"
 	set filelist to files of folder POSIX file "/Volumes/MERGE CENTRAL/FIP AUTOMATION/Hot Folder/" as alias list
 end tell
 
@@ -90,23 +90,19 @@ repeat with TheItem in filelist
 	set startSeconds to time of (current date)
 	
 	set ExitVar to ""
-	
-	tell application "Finder"
-		set {name:FileName, name extension:fileExtension} to TheItem
-		set ExcelDoc to TheItem
-	end tell
+
+	set ExcelDoc to TheItem as string
 	
 ---- STARTS TO BUILD XML FOR PDF CONSTRUCTOR ------
 
 	set r to 2
 	set FIPAutomation to "Merge Central:FIP AUTOMATION:"
 	set pdfBasePath to FIPAutomation & "Found Image Press Calendars:"
-	set excelDoc to FIPAutomation & "pdfconstructor:test.xlsx"
 	set theXMLFile to FIPAutomation & "pdfconstructor:FIP_Construct.pdfc"
 	set finishedXML to ""
 
 	tell application "Microsoft Excel"
-		open file excelDoc
+		open file ExcelDoc
 		tell row 2
 			set orderNumber to string value of cell 1
 			set clientName to string value of cell 2
@@ -131,10 +127,14 @@ repeat with TheItem in filelist
 				</elements>
 			</page>" & return
 
-	repeat while r < 7
-
+	repeat
 		tell application "Microsoft Excel"
 			tell row r
+				if value of column 1 is "TOTAL" then
+					set TotalQty to value of column 3
+					exit repeat
+				end if
+
 				set thisPDF to string value of column 4
 				set qty to (value of column 3/6)
 			end tell
@@ -146,7 +146,6 @@ repeat with TheItem in filelist
 			set finishedXML to finishedXML & "		<insert href='" & thisPDF & "' range='0-13'/>" & return
 		end repeat
 		set r to r + 1
-
 	end repeat
 
 	tell application "Microsoft Excel"
@@ -165,10 +164,13 @@ repeat with TheItem in filelist
 ----- END OF XML BUILD ------
 
 ------Calls PDF Constructor -----
+
 set finishedPDF to quoted form of POSIX path of finishedPDF
 set theXMLFile to quoted form of POSIX path of theXMLFile
-do shell script "pdfconstructor -f " & theXMLFile " -o " &  finishedPDF
 
+with timeout of 86400 seconds
+	do shell script "pdfconstructor -f " & theXMLFile & " -o " &  finishedPDF
+end timeout
 
 	
 	set timeString to time string of (current date) as string
