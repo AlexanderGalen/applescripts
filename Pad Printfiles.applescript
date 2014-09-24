@@ -17,24 +17,26 @@ tell application "QuarkXPress"
 	else
 		set isGroupBox to false
 	end if
+	
 	copy theSelection
 	set {y1, x1, y2, x2} to bounds of theSelection as list
 	set x1 to (coerce x1 to real)
 	set x2 to (coerce x2 to real)
-	set theWidth to (round (x2 - x1) * 100) / 100
+	set y1 to (coerce y1 to real)
+	set y2 to (coerce y2 to real)
+	set theWidth to x2 - x1
+	set theHeight to y2 - y1
 	
 	set impositionTemplatesPath to "Resource:Templates:Shortrun Templates.New:X.Igen.SR Templates:"
+	set newDocProperties to {page height:theHeight, page width:theWidth}
 	
+	--sets imposition templates and finished imposed filename according to size of product.
 	if theWidth is 4 then
-		set product to "CHCP"
 		set impositionTemplate to impositionTemplatesPath & "~CHCP.HouseShape CalendarPads:CHCP.House_28up Layout.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CHCP.print.pdf"
-		set newDocProperties to {page height:Çdata FXVM0000A200È, page width:Çdata FXHM00002001È}
 	else if theWidth is 3.75 then
-		set product to "CCCP"
 		set impositionTemplate to impositionTemplatesPath & "~CCP:CCP.Print.30up.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CCCP.print.pdf"
-		set newDocProperties to {page height:Çdata FXVM0000A200È, page width:Çdata FXHM00000E01È}
 	else
 		return "Sizing is neither a CCCP or CHCP"
 	end if
@@ -45,21 +47,14 @@ tell application "QuarkXPress"
 	tell document 1
 		activate
 		paste
+		
 		if isGroupBox then
-			if product is "CCCP" then
-				set bounds of group box 1 to {0, 0, 2.25, 3.75}
-			else
-				set bounds of group box 1 to {0, 0, 2.25, 4}
-			end if
+			set bounds of group box 1 to {0, 0, theHeight, theWidth}
 		else
-			if product is "CCCP" then
-				set bounds of picture box 1 to {0, 0, 2.25, 3.75}
-			else
-				set bounds of picture box 1 to {0, 0, 2.25, 4}
-			end if
+			set bounds of picture box 1 to {0, 0, theHeight, theWidth}
 		end if
 		
-		--print print output style "Proof"
+		print print output style "Proof"
 	end tell
 	
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"
