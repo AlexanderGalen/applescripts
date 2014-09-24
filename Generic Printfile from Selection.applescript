@@ -21,6 +21,7 @@ set i to 1
 set activeJobs to "HOM_Shortrun:~HOM Active Jobs:"
 set theCondition to true
 set thisprintFile to activeJobs & jobNumber & ":" & jobNumber & ".printfile." & i & ".pdf"
+set for4Over to "ART DEPARTMENT-NEW:FOR 4over:"
 
 repeat while theCondition
 	tell application "Finder"
@@ -74,3 +75,7 @@ tell application "QuarkXPress"
 		close document 2 without saving
 	end if
 end tell
+
+set posixPrintfile to quoted form of POSIX path of thisprintFile
+set posixDestination to quoted form of POSIX path of for4Over
+do shell script "cp -p " & posixPrintfile & " " & posixDestination
