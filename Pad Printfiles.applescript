@@ -1,3 +1,34 @@
+--checks to make sure quark is open and a document is open and something is selected and provides user feedback
+
+set documentOpen to false
+set validSelection to false
+set quarkRunning to false
+
+on is_running(appName)
+	tell application "System Events" to (name of processes) contains appName
+end is_running
+
+set quarkRunning to is_running("QuarkXPress")
+if quarkRunning then
+	tell application "QuarkXPress"
+		try
+			get document 1
+			set documentOpen to true
+			if selection is not null then set validSelection to true
+		end try
+	end tell
+end if
+
+if not (quarkRunning and documentOpen and validSelection) then
+	tell application "QuarkXPress"
+		activate
+		display alert "For this script to work, Quark must be running, have a document open, and have area which you would like to make a printfile with selected"
+	end tell
+	return
+end if
+
+
+
 tell application "QuarkXPress"
 	set theName to name of document 1 as string
 	try
