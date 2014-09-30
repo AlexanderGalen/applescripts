@@ -53,6 +53,12 @@ repeat while ExitVariable is not "Exit"
 	--first chunk of psuedo repeat loop
 	repeat 1 times
 		
+		--resets value of prevArt, prevInfo, and prevJob to avoid jobs copying previous folder from previous row in DB
+		set prevArt to ""
+		set prevInfo to ""
+		set prevJob to ""
+		
+		
 		tell application "Microsoft Excel"
 			tell row i
 				set imageNames to {value of cell 13, value of cell 14, value of cell 15, value of cell 16, value of cell 29, value of cell 30, value of cell 31, value of cell 32, value of cell 33}
