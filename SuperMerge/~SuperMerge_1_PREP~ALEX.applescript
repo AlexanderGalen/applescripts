@@ -148,19 +148,6 @@ rm(theFile)
 
 
 tell application "Finder"
-	--switched to using shell scripts to copy/move/delete above. these are still here just in case i need to look at them
-	
-	--move entire contents of sourceFolder1 to folder targetFolder with replacing
-	--move entire contents of sourceFolder2 to folder targetFolder with replacing
-	--move entire contents of sourceFolder3 to folder targetFolder with replacing
-	--move entire contents of sourceFolder4 to folder targetFolder with replacing
-	--move entire contents of sourceFolder5 to folder targetFolder with replacing
-	--move entire contents of sourceFolder6 to folder targetFolder with replacing
-	--delete entire contents of sourceFolder1
-	--delete entire contents of sourceFolder2
-	--delete entire contents of sourceFolder3
-	--move file theFile to folder "HOM_Shortrun:Databases:SuperMerge Old DBs:"
-	
 	
 	--converts targetfolder to an alias, then sets a filelist for looping through.
 	set targetFolder to targetFolder as alias
@@ -196,8 +183,8 @@ end tell
 
 set ProcessedImagesFolder to "HOM_Shortrun:SUPERMergeIN:CLIENT Images:"
 tell application "Finder"
-	set filelist to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
-	repeat with TheItem in filelist
+	set fileList to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
+	repeat with TheItem in fileList
 		set {name:FileName, name extension:fileExtension} to TheItem
 		if name extension of TheItem is "pdf" then
 			try
