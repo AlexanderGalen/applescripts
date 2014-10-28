@@ -63,10 +63,10 @@ tell application "QuarkXPress"
 	
 	--sets imposition templates and finished imposed filename according to size of product.
 	if theWidth is 4 then
-		set impositionTemplate to impositionTemplatesPath & "~CHCP.HouseShape CalendarPads:CHCP.House_28up Layout.qxp"
+		set impositionTemplate to impositionTemplatesPath & "~CACH.HouseShape CalendarPads:CHCP.House_28up Layout.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CHCP.print.pdf"
 	else if theWidth is 3.75 then
-		set impositionTemplate to impositionTemplatesPath & "~CCP:CCP.Print.30up.qxp"
+		set impositionTemplate to impositionTemplatesPath & "~CACP:CCP.Print.30up.qxp"
 		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CCCP.print.pdf"
 	else
 		return "Sizing is neither a CCCP or CHCP"
@@ -85,7 +85,7 @@ tell application "QuarkXPress"
 			set bounds of picture box 1 to {0, 0, theHeight, theWidth}
 		end if
 		
-		print print output style "Proof"
+		--print print output style "Proof"
 	end tell
 	
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"

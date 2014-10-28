@@ -42,7 +42,7 @@ tell application "Finder"
 	-- This raises an error if the folder doesn't contain any files
 	set theFile to (last item of result) as alias
 	set theFilename to the name of theFile as string
-	set dbdate to text 12 thru 15 of theFilename
+	set dbdate to text 11 thru 14 of theFilename
 	set mergeFolder to "MERGE CENTRAL:SUPERmerge 2:Merges:"
 	set mergeFOlderName to dbdate & "2014_merge"
 	make new folder at folder mergeFolder with properties {name:mergeFOlderName}
@@ -71,19 +71,18 @@ tell application "Microsoft Excel"
 		tell used range
 			set rc to count of rows
 		end tell
-		copy range range ("A2:A" & rc)
+		set fileNames to value of range ("A2:A" & rc)
 	end tell
 end tell
 
 set fileNamesFile to "MERGE CENTRAL:SUPERmerge 2:Databases:File Names.txt"
-tell application "TextWrangler"
-	open file fileNamesFile
-	select every text of document 1
-	activate
-	paste
-	save text document 1 to file fileNamesFile without saving as stationery
-	quit
-end tell
+set openedFile to open for access file fileNamesFile with write permission
+set eof of openedFile to 0
+repeat with thisItem in fileNames
+	set thisItem to thisItem as string
+	write thisItem & "\n" to openedFile starting at eof
+end repeat
+close access openedFile
 
 tell application "Microsoft Excel"
 	-- Set the current worksheet to our loop position
@@ -183,8 +182,8 @@ end tell
 
 set ProcessedImagesFolder to "HOM_Shortrun:SUPERMergeIN:CLIENT Images:"
 tell application "Finder"
-	set fileList to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
-	repeat with TheItem in fileList
+	set filelist to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
+	repeat with TheItem in filelist
 		set {name:FileName, name extension:fileExtension} to TheItem
 		if name extension of TheItem is "pdf" then
 			try
