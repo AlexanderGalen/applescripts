@@ -8,6 +8,14 @@ tell application "QuarkXPress"
 		on error
 			display dialog "Document failed to save. Please Close the document, reopen, and try again."
 		end try
+
+		set missingImages to missing of every image
+		set modifiedImages to modified of every image
+		if (missingImages contains true or modifiedImages contains true) then
+			display dialog "Document contains Images that are either unlinked or modified, please update them before running this script"
+			return;
+		end if
+
 		set tool mode to drag mode
 		set docPath to file path as string
 		set docName to name as string

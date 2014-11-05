@@ -32,9 +32,9 @@ end if
 tell application "QuarkXPress"
 	tell document 1
 		set missingImages to missing of every image
-		if missingImages contains true then
-			display dialog "Document has unlinked images. Please Relink them before running this script."
-			return
+		set modifiedImages to modified of every image
+		if (missingImages contains true or modifiedImages contains true) then
+			display dialog "Document contains Images that are either unlinked or modified, please update them before running this script"
 		end if
 	end tell
 	set theName to name of document 1 as string
