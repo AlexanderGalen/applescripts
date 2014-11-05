@@ -182,8 +182,8 @@ end tell
 
 set ProcessedImagesFolder to "HOM_Shortrun:SUPERMergeIN:CLIENT Images:"
 tell application "Finder"
-	set filelist to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
-	repeat with TheItem in filelist
+	set fileList to files of folder POSIX file "/Volumes/HOM_Shortrun/PDFs to process/" as alias list
+	repeat with TheItem in fileList
 		set {name:FileName, name extension:fileExtension} to TheItem
 		if name extension of TheItem is "pdf" then
 			try
