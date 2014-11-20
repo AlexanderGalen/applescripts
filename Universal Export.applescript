@@ -59,10 +59,11 @@ tell application "QuarkXPress"
 	--this part is printing, and saving the proof
 	tell currentDoc
 		
-		--checks to make sure no images are unlinked.
+		--checks to make sure no images are unlinked or modified.
 		set missingImages to missing of every image
-		if missingImages contains true then
-			display dialog "Some images are unlinked. Relink them, then run this script again."
+		set modifiedImages to modified of every image
+		if missingImages contains true or modifiedImages contains true then
+			display dialog "Some images are unlinked or modified. Update them, then run this script again."
 			return
 		end if
 		
@@ -108,7 +109,15 @@ tell application "QuarkXPress"
 		
 		set printFilePath to jobFolder & jobNumber & ".v" & proofNumber & ".printfile.pdf"
 		set proofPath to jobFolder & jobNumber & ".v" & proofNumber & "." & newVersionNumber & ".pdf"
-		
+		--check if proof already exists and display dialog to ask user what to do if so
+		tell application "Finder"
+			if exists proofPath then
+				tell application "QuarkXPress"
+					display dialog "Proof file already exists in Job Folder. Overwrite?"
+				end tell
+				delete proofPath
+			end if
+		end tell
 	end tell
 end tell
 
@@ -135,9 +144,12 @@ tell application "QuarkXPress"
 		set tool mode to drag mode
 		set selected of every generic box to false
 		--selects every box that is not named. this should only be the product and any boxes manually created.
+		--uses two separate try blocks because one of the two will often fail, and it should execute both select commands even if the first fails. the second wont execute if they are in the same block
+		try
+			set selected of every generic box whose name is "" to true
+		end try
 		try
 			set selected of every generic box whose name is null to true
-			set selected of every generic box whose name is "" to true
 		end try
 		set thisProduct to selection
 		
