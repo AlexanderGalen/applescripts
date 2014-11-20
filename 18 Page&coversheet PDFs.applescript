@@ -1,19 +1,23 @@
-set sourceFolder to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:NonHoliday:"
-tell application "Finder"
-	set fileList to entire contents of folder sourceFolder
-end tell
+tell current application to set fileList to choose file with multiple selections allowed
 
-repeat with theFile in fileList
+repeat with thisFile in fileList
 	tell application "Finder"
+		set thisFile to thisFile as alias
 		set coverSheet to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Coversheet:A6 Coversheet Template.qxp" as alias
 		set finishedCoverSheet to "HOM:PRODUCTS:NOTE CARD CAFE:SETS A6:¥ A6.SingleCards.New Size:Coversheet:coverSheet.pdf"
-		set theName to name of theFile
+		set theName to name of thisFile
 		set theLength to length of theName
 		set productCode to characters 1 thru 12 of theName as string
 		set productName to characters 14 thru (theLength - 4) of theName as string
 		set finishedFileName to "A6.36singles." & productCode & "." & productName & ".pdf"
-		set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Non Holiday 19 Page files:" & finishedFileName
 		set coverText to productCode & return & productName
+		
+		set stringPath to thisFile as string
+		if stringPath contains "NonHoliday" then
+			set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Non Holiday 19 Page files:" & finishedFileName
+		else
+			set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Holiday 19 Page files:" & finishedFileName
+		end if
 	end tell
 	
 	
@@ -29,8 +33,8 @@ repeat with theFile in fileList
 	
 	tell application "Adobe Acrobat Pro"
 		open file finishedCoverSheet
-		set theFile to theFile as string
-		open file theFile
+		set thisFile to thisFile as string
+		open file thisFile
 		set r to 1
 		repeat 18 times
 			insert pages document 1 after 1 from document 2 starting with 1 number of pages 1
