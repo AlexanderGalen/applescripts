@@ -31,10 +31,11 @@ on rm(source)
 end rm
 
 on logToFile(logText, LogFile)
-	set errorOccured to false
-	open for access file LogFile with write permission
-	write (logText & return) to file LogFile starting at eof
-	close access file LogFile
+	set posixLogFile to quoted form of POSIX path of LogFile
+	do shell script "echo " & logText & " > " & posixLogFile
+	set openedFile to open for access file LogFile with write permission
+	write (logText & return) to openedFile starting at eof
+	close access openedFile
 end logToFile
 
 --initializing some variables
@@ -99,6 +100,7 @@ repeat while ExitVariable is not "Exit"
 				set textToLog to true
 				set logText to (current date) & tab & jobNumber & tab & tab & tab & errStr & tab & errorNumber as text
 				set skipvar to true
+				set prevJob to ""
 			end try
 		else if prevInfo is not "" then
 			try
@@ -109,6 +111,7 @@ repeat while ExitVariable is not "Exit"
 				set textToLog to true
 				set logText to (current date) & tab & jobNumber & tab & tab & tab & errStr & tab & errorNumber as text
 				set skipvar to true
+				set prevJob to ""
 			end try
 		else
 			set skipvar to true
@@ -118,14 +121,20 @@ repeat while ExitVariable is not "Exit"
 		--skips over copying old job if the result of value check determines that it should be skipped
 		
 		if textToLog then
+			set errorOccured to true
 			logToFile(logText, LogFile)
 		end if
 		
 		if skipvar then
+			set skipvar to false
 			exit repeat
 		end if
 		
-		--this whole chunk is my (alex's) copy old job to new folder script
+		set testLog to "Macintosh HD:Users:maggie:desktop:testlog.txt"
+		set testLogText to "row: " & i & "\tJob Number: " & jobNumber & "\tPrevious Job Number: " & prevJob & "\n"
+		logToFile(testLogText, testLog)
+		
+		--this whole chunk is my (Alex) copy old job to new folder script
 		--whole copying process is wrapped in a try block. If it fails, it just continues on to the next job.
 		try
 			
@@ -140,6 +149,7 @@ repeat while ExitVariable is not "Exit"
 				set thisSource to OldPth & prevJob
 				
 				-- shell script that finds and copies old job folder to new one
+				log thisSource
 				cp_all(thisSource, thisJobFolder)
 				
 			end if
@@ -189,9 +199,7 @@ repeat while ExitVariable is not "Exit"
 					--converts prevJob back into a string
 					set prevJob to prevJob as string
 					
-					set Chars to characters of prevJob
-					set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
-					set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & First3 & "xxx.jobs:"
+					set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & characters 1 thru 3 of prevJob & "xxx.jobs:" as string
 					set FinishedArchivePath to OldPth & prevJob
 					
 				end if
@@ -199,12 +207,15 @@ repeat while ExitVariable is not "Exit"
 			
 			--duplicates whichever path was found to exist into the Active Job Folder
 			if copyvar then
+				log FinishedOldPath
 				cp(FinishedOldPath, thisJobFolder)
 			else
+				log FinishedArchivePath
 				cp_all(FinishedArchivePath, thisJobFolder)
 			end if
 			
 		on error errStr number errorNumber
+			set errorOccured to true
 			set logText to (current date) & tab & jobNumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
 		end try
@@ -226,6 +237,7 @@ repeat while ExitVariable is not "Exit"
 				try
 					cp(thisImagePath, thisJobFolder)
 				on error errStr number errorNumber
+					set errorOccured to true
 					set logText to (current date) & tab & jobNumber & tab & thisImage & tab & tab & errStr & tab & errorNumber as text
 					logToFile(logText, LogFile)
 				end try

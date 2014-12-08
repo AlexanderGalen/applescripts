@@ -75,13 +75,17 @@ tell application "Microsoft Excel"
 	end tell
 end tell
 
+--builds file names text to write to file
+set fileNamesText to ""
+repeat with thisItem in fileNames
+	set thisItem to thisItem as string
+	set fileNamesText to fileNamesText & thisItem & "\n"
+end repeat
+
 set fileNamesFile to "MERGE CENTRAL:SUPERmerge 2:Databases:File Names.txt"
 set openedFile to open for access file fileNamesFile with write permission
 set eof of openedFile to 0
-repeat with thisItem in fileNames
-	set thisItem to thisItem as string
-	write thisItem & "\n" to openedFile starting at eof
-end repeat
+write fileNamesText to openedFile starting at eof
 close access openedFile
 
 tell application "Microsoft Excel"

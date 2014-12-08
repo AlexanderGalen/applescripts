@@ -93,7 +93,7 @@ tell application "QuarkXPress"
 			set bounds of picture box 1 to {0, 0, theHeight, theWidth}
 		end if
 
-		--print print output style "Proof"
+	  print print output style "Proof"
 	end tell
 
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"
