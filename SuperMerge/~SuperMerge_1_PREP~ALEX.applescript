@@ -1,16 +1,15 @@
 --function to replace "oldItem" with "newItem" in "someText" and return the new string
 on replaceText(someText, oldItem, newItem)
-
-     set {tempTID, AppleScript's text item delimiters} to {AppleScript's text item delimiters, oldItem}
-     try
-          set {itemList, AppleScript's text item delimiters} to {text items of someText, newItem}
-          set {someText, AppleScript's text item delimiters} to {itemList as text, tempTID}
-     on error errorMessage number errorNumber -- oops
-          set AppleScript's text item delimiters to tempTID
-          error errorMessage number errorNumber -- pass it on
-     end try
-
-     return someText
+	
+	set {tempTID, AppleScript's text item delimiters} to {AppleScript's text item delimiters, oldItem}
+	try
+		set {itemList, AppleScript's text item delimiters} to {text items of someText, newItem}
+		set {someText, AppleScript's text item delimiters} to {itemList as text, tempTID}
+	on error errorMessage number errorNumber -- oops
+		set AppleScript's text item delimiters to tempTID
+		error errorMessage number errorNumber -- pass it on
+	end try
+	return someText
 end replaceText
 
 --these subroutines take a mac path as parameters. they fail if there is nothing in the folder so it checks first and does nothing if folder is empty
@@ -85,12 +84,12 @@ tell application "Microsoft Excel"
 		repeat while r is less than rc
 			tell row r
 				set thisText to value of cell 36
-				set newText to my replaceText(thisText,"\r"," ")
+				set newText to my replaceText(thisText, "\r", " ")
 				set value of cell 36 to newText
 			end tell
 			set r to r + 1
 		end repeat
-
+		
 	end tell
 end tell
 
@@ -111,19 +110,19 @@ tell application "Microsoft Excel"
 	-- Set the current worksheet to our loop position
 	set theWorksheet to active sheet of active workbook
 	--activate object theWorksheet
-
+	
 	-- Save the worksheet as a CSV file
 	set theSheetsPath to "HOM_Shortrun:Databases:SuperMerge.THIS.txt" as string
 	save as theWorksheet filename theSheetsPath file format text Mac file format with overwrite
-
+	
 	-- Close the worksheet that we've just created
 	close active workbook saving no
-
+	
 	delay 4
-
+	
 	-- Clean up and close files
 	close workbooks
-
+	
 	open "HOM_Shortrun:Databases:SuperMerge.THIS.txt"
 	select range ("AJ2:AJ" & rc)
 end tell
@@ -139,7 +138,7 @@ tell application "Finder"
 	set targetFolder to "HOM_Shortrun:Process Client Images:"
 	set PDFTargetFolder to "HOM_Shortrun:PDFs to process:"
 	--move entire contents of targetFolder to folder backupFolder
-
+	
 end tell
 
 --moves all image files to the images to process folder
@@ -170,12 +169,12 @@ rm(theFile)
 
 
 tell application "Finder"
-
+	
 	--converts targetfolder to an alias, then sets a filelist for looping through.
 	set targetFolder to targetFolder as alias
 	set FileList2 to (files of entire contents of targetFolder) as alias list
-
-
+	
+	
 	--moves pdfs from target folder to pdfs to process folder
 end tell
 repeat with TheItem in FileList2

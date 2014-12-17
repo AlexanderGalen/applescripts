@@ -150,6 +150,7 @@ repeat while ExitVariable is not "Exit"
 				
 				-- shell script that finds and copies old job folder to new one
 				log thisSource
+				log thisJobFolder
 				cp_all(thisSource, thisJobFolder)
 				
 			end if
@@ -208,9 +209,11 @@ repeat while ExitVariable is not "Exit"
 			--duplicates whichever path was found to exist into the Active Job Folder
 			if copyvar then
 				log FinishedOldPath
+				log thisJobFolder
 				cp(FinishedOldPath, thisJobFolder)
 			else
 				log FinishedArchivePath
+				log thisJobFolder
 				cp_all(FinishedArchivePath, thisJobFolder)
 			end if
 			
