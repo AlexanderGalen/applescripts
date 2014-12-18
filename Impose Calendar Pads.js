@@ -3,6 +3,7 @@ var modulesPath = "/Volumes/RESOURCE/node_modules/"
 var fs = require('fs');
 var hummus = require(modulesPath + 'hummus');
 var mv = require(modulesPath + 'mv');
+var path = require('path');
 
 //define global variables for both CACP and CHCP
 
@@ -10,7 +11,6 @@ var pageWidth = 14.33 * 72,
 pageHeight = 22.5 * 72,
 singlePageHeight = 2.25 * 72;
 
-var finishedPDFName = "/Users/maggie/imposed.pdf"
 // script expects one parameter to be passed to it: the path to the file to be imposed
 var fileToImpose = process.argv[2];
 
@@ -34,10 +34,17 @@ else if(singlePageWidth == 3.75) {
 	imposeCACP();
 }
 
+
+
+
 /*======= Function Declarations =======*/
 
 //define imposition functions
 function imposeCHCP(){
+	// builds the finished pdf name based on the path to the file to impose
+	var parentFolder = path.dirname(fileToImpose);
+	var jobNumber = path.basename(parentFolder)
+	var finishedPDFName = parentFolder + "/" + jobNumber + "_CHCP.pdf"
 	var page = pdfWriter.createPage(0,0,singlePageWidth*72,singlePageHeight);
 	var cxt = pdfWriter.startPageContentContext(page);
 	cxt.m(11.484,0).l(276.009,0).l(276.009,81.693).l(288,93.761).l(288,134.525).l(156.137,162).l(133.5,162).l(94.055,154.646).l(90.413,162).l(27.603,162).l(27.609,141.695).l(0,133.147).l(0,96.274).l(11.476,88.978).h().W().n().drawImage(0,0,fileToImpose);
@@ -115,6 +122,11 @@ function imposeCHCP(){
 function imposeCACP() {
 	//delete the tempfile that we used to determine the dimensions of the pdf to impose
 	fs.unlink(tempFile);
+
+	// builds the finished pdf name based on the path to the file to impose
+	var parentFolder = path.dirname(fileToImpose);
+	var jobNumber = path.basename(parentFolder)
+	var finishedPDFName = parentFolder + "/" + jobNumber + "_CACP.pdf"
 
 	//creates the file for the imposed PDF, a new page, and a content context for writing to.
 	var pdfWriter = hummus.createWriter(finishedPDFName);
