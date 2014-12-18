@@ -60,7 +60,9 @@ tell application "Microsoft Excel"
 				--sends an http request with all that data
 				do shell script "curl --data " & quoted form of dataString & " http://dev.houseofmagnets.com/utilities/bcardcreator/"
 				do shell script "curl -o " & pdfDestination & " " & previewPdfUrl
-
+				
+				
+				set r to r + 1
 				
 				
 			end tell
