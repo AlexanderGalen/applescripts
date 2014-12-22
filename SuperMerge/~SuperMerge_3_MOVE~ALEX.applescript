@@ -31,8 +31,6 @@ on rm(source)
 end rm
 
 on logToFile(logText, LogFile)
-	set posixLogFile to quoted form of POSIX path of LogFile
-	do shell script "echo " & logText & " > " & posixLogFile
 	set openedFile to open for access file LogFile with write permission
 	write (logText & return) to openedFile starting at eof
 	close access openedFile
