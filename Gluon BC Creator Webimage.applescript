@@ -40,20 +40,27 @@ tell application "Microsoft Excel"
 				set thisTemplateName to my encode_text(string value of cell 2, true, true)
 				set thisPhoto to my encode_text(string value of cell 3, true, true)
 				
+				
+				
 				--for the Gallery image, use empty info lines to let the text in the original document be used, and use the 3 default symbols
 				set galleryOutputFile to thisTemplateName & ".G.G"
 				
-				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & galleryOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & thisPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=&txtB_Font_InfoLine1=&txtInfoLine2=&txtInfoLine3=&txtInfoLine4=&txtInfoLine5=&txtInfoLine6=&txtInfoLine7=&txtInfoLine8=&txtInfoLine9=&txtInfoLine10=&txtInfoLine11=&txtInfoLine12=&txtInfoLine13=&txtInfoLine14=&txtSymbol1=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3AA.Realtor.R.Stroke.eps&txtSymbol2=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3AB.EqualHousing.Stroke.eps&txtSymbol3=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3AC.Realtor.MLS.Stroke.eps&btnSend=Send%20to%20Quark"
+				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & galleryOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & thisPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=&txtB_Font_InfoLine1=&txtInfoLine2=&txtInfoLine3=&txtInfoLine4=&txtInfoLine5=&txtInfoLine6=&txtInfoLine7=&txtInfoLine8=&txtInfoLine9=&txtInfoLine10=&txtInfoLine11=&txtInfoLine12=&txtInfoLine13=&txtInfoLine14=&txtSymbol1=Quark%3AHPS+Assets%3ARealtor+Symbols+Stroked%3AA.Realtor.R.Stroke.eps&txtSymbol2=Quark%3AHPS+Assets%3ARealtor+Symbols+Stroked%3AC.Realtor.MLS.Stroke.eps&txtSymbol3=Quark%3AHPS+Assets%3ARealtor+Symbols+Stroked%3AB.EqualHousing.Stroke.eps&btnSend=Send%20to%20Quark"
+				
 				set pdfDestination to quoted form of ("/Users/maggie/documents/WEB MERGE/Full PDFS/" & galleryOutputFile & ".pdf")
 				set galleryPdfUrl to "http://gluon.houseofmagnets.com/InProduction/TEST/" & galleryOutputFile & ".pdf"
 				--sends an http request with all that data
 				do shell script "curl --data " & quoted form of dataString & " http://dev.houseofmagnets.com/utilities/bcardcreator/"
 				do shell script "curl -o " & pdfDestination & " " & galleryPdfUrl
 				
+				
+				
+				--build preview PDFs
+				
 				set previewOutputFile to thisTemplateName & ".P.P"
 				set placeholderPhoto to "GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3APlaceHolder_Headshot.eps"
 				
-				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & previewOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & placeholderPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=Info%20Line%201&txtB_Font_InfoLine1=&txtInfoLine2=Info%20Line%202&txtInfoLine3=Info%20Line%203&txtInfoLine4=Info%20Line%204&txtInfoLine5=Info%20Line%205&txtInfoLine6=Info%20Line%206&txtInfoLine7=Info%20Line%207&txtInfoLine8=Info%20Line%208&txtInfoLine9=Info%20Line%209&txtInfoLine10=Info%20Line%2010&txtInfoLine11=Info%20Line%2011&txtInfoLine12=Info%20Line%2012&txtInfoLine13=Info%20Line%2013&txtInfoLine14=Info%20Line%2014&txtSymbol1=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol1-placeholder.jpg&txtSymbol2=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol2-placeholder.jpg&txtSymbol3=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol3-placeholder.jpg&btnSend=Send%20to%20Quark"
+				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & previewOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & placeholderPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=Agent%20Name&txtB_Font_InfoLine1=&txtInfoLine2=Title&txtInfoLine3=Info%20Line%201&txtInfoLine4=Info%20Line%202&txtInfoLine5=Info%20Line%203&txtInfoLine6=Info%20Line%204&txtInfoLine7=Info%20Line%205&txtInfoLine8=Info%20Line%206&txtInfoLine9=Info%20Line%207&txtInfoLine10=Info%20Line%208&txtInfoLine11=Info%20Line%209&txtInfoLine12=Info%20Line%2010&txtInfoLine13=Info%20Line%2011&txtInfoLine14=Info%20Line%2012&txtSymbol1=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol1-placeholder.jpg&txtSymbol2=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol2-placeholder.jpg&txtSymbol3=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol3-placeholder.jpg&btnSend=Send%20to%20Quark"
 				
 				set pdfDestination to quoted form of ("/Users/maggie/documents/WEB MERGE/Full PDFS/" & previewOutputFile & ".pdf")
 				set previewPdfUrl to "http://gluon.houseofmagnets.com/InProduction/TEST/" & previewOutputFile & ".pdf"
