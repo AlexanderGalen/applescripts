@@ -9,7 +9,13 @@ tell application "QuarkXPress"
 		end if
 
 		set docPath to file path as string
-		set finishedPDFName to characters 1 thru ((length of docPath) - 4) of docPath & ".1.pdf" as string
+		set r to 1
+		set fileExists to true
+		repeat while fileExists is true
+			set finishedPDFName to characters 1 thru ((length of docPath) - 4) of docPath & "." & r & ".pdf" as string
+			tell application "Finder" to set fileExists to exists of finishedPDFName
+			set r to r + 1
+		end repeat
 
 	end tell
 
@@ -24,7 +30,5 @@ tell application "QuarkXPress"
 		end tell
 		export activeSpace in finishedPDFName as "PDF" PDF output style "PDF Proof"
 	end try
-
-	close document 1 without saving
 
 end tell
