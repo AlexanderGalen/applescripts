@@ -14,9 +14,9 @@ repeat with thisFile in fileList
 		
 		set stringPath to thisFile as string
 		if stringPath contains "NonHoliday" then
-			set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Non Holiday 19 Page files:" & finishedFileName
+			set finishedFilePath to "HOM:PRODUCTS:NOTE CARD CAFE:SETS A6:¥ A6.SingleCards.NewSize.19pge files:Non Holiday 19 Page Files:" & finishedFileName
 		else
-			set finishedFilePath to "hom:products:note card cafe:sets a6:¥ A6.SingleCards.New Size:Holiday 19 Page files:" & finishedFileName
+			set finishedFilePath to "HOM:PRODUCTS:NOTE CARD CAFE:SETS A6:¥ A6.SingleCards.NewSize.19pge files:Holiday 19 Page Files:" & finishedFileName
 		end if
 	end tell
 	
