@@ -52,10 +52,13 @@ repeat while ExitVariable is not "Exit"
 	--first chunk of psuedo repeat loop
 	repeat 1 times
 		
-		--resets value of prevArt, prevInfo, and prevJob to avoid jobs copying previous folder from previous row in DB
+		--resets value of prevArt, prevInfo, prevJob, and copyvar to avoid jobs copying previous folder from previous row in DB
 		set prevArt to ""
 		set prevInfo to ""
 		set prevJob to ""
+		--this one caused me problems. 
+		--it was getting set to true when a job was found in printed or active jobs, but then when the next job was in the archives, it stayed true, and when the script checks which place to copy from by checking that variable, it found it true and used 'FinishedOldPath' to copy, which was still set as the value from the previous row.
+		set copyvar to false
 		
 		
 		tell application "Microsoft Excel"

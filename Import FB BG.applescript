@@ -35,9 +35,9 @@ tell application "QuarkXPress"
 end tell
 
 if theHeight = 7.25 then
-	set theFile to "HOM_Shortrun:SUPERmergeIN:Custom Magnet Backgrounds:FB:FBQS14-"
+	set theFile to "HOM_Shortrun:SUPERmergeIN:Custom Magnet Backgrounds:BB:BBQS15-"
 else
-	set theFile to "HOM_Shortrun:SUPERmergeIN:Custom Magnet Backgrounds:FB:FBFC14-"
+	set theFile to "HOM_Shortrun:SUPERmergeIN:Custom Magnet Backgrounds:BB:BBFC15-"
 end if
 
 tell application "QuarkXPress"
@@ -59,12 +59,12 @@ end if
 
 tell application "QuarkXPress"
 	tell document 1
-		try
-			set image 1 of theBox to alias theFile
-		on error
-			display dialog "An Error Occured"
-			return
-		end try
+		--try
+		set image 1 of theBox to alias theFile
+		--on error
+		--	display dialog "An Error Occured"
+		--	return
+		--end try
 	end tell
 end tell
 
