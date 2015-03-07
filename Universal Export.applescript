@@ -28,6 +28,11 @@ on rm(source)
 	do shell script "rm -d -f " & source
 end rm
 
+on getContainingFolder(thisFile)
+	set posixFile to quoted form of POSIX path of thisFile
+	set dirName to (do shell script "dirname " & posixFile & " | sed 's|/Volumes/||' | sed 's|/|:|g'") & ":"
+end getContainingFolder
+
 
 --checks to make sure boxes are named in quark to be sure that the currently opened job came from a template with named boxes.
 tell application "QuarkXPress"
@@ -55,10 +60,10 @@ tell application "QuarkXPress"
 		display dialog "Unable to get document 1 or project 1."
 		return
 	end try
-
+	
 	--this part is printing, and saving the proof
 	tell currentDoc
-
+		
 		--checks to make sure no images are unlinked or modified.
 		set missingImages to missing of every image
 		set modifiedImages to modified of every image
@@ -66,12 +71,12 @@ tell application "QuarkXPress"
 			display dialog "Some images are unlinked or modified. Update them, then run this script again."
 			return
 		end if
-
+		
 		--checks to make sure die line layer is on. expects die line to be on the topmost layer. will work fine if it is on same layer as rest of layout.
 		if visible of layer 1 is false then
 			set visible of layer 1 to true
 		end if
-
+		
 		--changes date and version number in proof sheet. expects the text box containing all that info to be named "Proof Sheet Info"
 		set word 5 of story 1 of text box "Proof Sheet Info" to thisdate
 		set proofSheetInfoText to story 1 of text box "Proof Sheet Info"
@@ -83,7 +88,7 @@ tell application "QuarkXPress"
 		set proofSheetInfoText to theseTextItems as string
 		set story 1 of text box "Proof Sheet Info" to proofSheetInfoText
 		set AppleScript's text item delimiters to ""
-
+		
 		--tries to save quark document. this happens as early as possible in the script in case it fails
 		try
 			save
@@ -91,11 +96,11 @@ tell application "QuarkXPress"
 			display dialog "Document failed to save. Save it manually, close it, then re-open and try again."
 			return
 		end try
-
+		
 		set qxpName to name
 		set jobNumber to characters 1 thru 6 of qxpName as string
-		set jobFolder to "HOM_Shortrun:~HOM Active Jobs:" & jobNumber & ":"
-
+		set jobFolder to my getContainingFolder(file path of currentDoc)
+		
 		--gets version number from the name of quark document
 		if length of qxpName is 14 then --standard, non group order document name
 			set proofNumber to 1
@@ -106,9 +111,9 @@ tell application "QuarkXPress"
 		else
 			display dialog "Name of quark document does not match standard naming convention. This script will only work correctly with documents that follow the standard naming convention"
 		end if
-
-		set printFilePath to jobFolder & jobNumber & ".v" & proofNumber & ".printfile.pdf"
-		set proofPath to jobFolder & jobNumber & ".v" & proofNumber & "." & newVersionNumber & ".pdf"
+		
+		set printFilePath to jobFolder & jobNumber & ".v" & proofNumber & ".printfile.pdf" as string
+		set proofPath to jobFolder & jobNumber & ".v" & proofNumber & "." & newVersionNumber & ".pdf" as string
 		--check if proof already exists and display dialog to ask user what to do if so
 		tell application "Finder"
 			if exists proofPath then
@@ -134,10 +139,10 @@ end if
 
 
 tell application "QuarkXPress"
-
+	
 	print currentDoc print output style "Proof"
 	export layout space 1 of currentProj in proofPath as "PDF" PDF output style "PDF Proof"
-
+	
 	--this part is saving the printfile.
 	tell currentDoc
 		--sets tool to selection tool and deselects all boxes to avoid including any unwanted boxes in printfile
@@ -152,7 +157,7 @@ tell application "QuarkXPress"
 			set selected of every generic box whose name is null to true
 		end try
 		set thisProduct to selection
-
+		
 		--checks if product is composed of multiple boxes or a single box. this is to ensure that later, when setting the bounds in the new document, if there are multiple, it sets the bounds of a "group box" and if there is only one, a "generic box"
 		if class of thisProduct is group box then
 			set grouped of thisProduct to true
@@ -160,9 +165,9 @@ tell application "QuarkXPress"
 		else
 			set isGroupBox to false
 		end if
-
+		
 		copy thisProduct
-
+		
 		--gets sizing of the product for the creation of the printfile document
 		set {y1, x1, y2, x2} to bounds of thisProduct as list
 		set x1 to (coerce x1 to real)
@@ -173,10 +178,10 @@ tell application "QuarkXPress"
 		set theHeight to y2 - y1
 		close without saving
 	end tell
-
+	
 	--makes new document for printfile using measurements
 	set thisPrintFileDoc to make new document with properties {page height:theHeight, page width:theWidth}
-
+	
 	--pastes product in newly created document, and sets its bounds so that it is lined up in the top left corner
 	tell document 1
 		activate
@@ -187,7 +192,7 @@ tell application "QuarkXPress"
 			set bounds of generic box 1 to {0, 0, theHeight, theWidth}
 		end if
 	end tell
-
+	
 	--deletes printfile if it already exists so quark is free to export the new one.
 	tell application "Finder"
 		set existsPrintFile to exists of printFilePath
@@ -202,7 +207,7 @@ tell application "QuarkXPress"
 	--exports new printfile in job folder and closes document
 	export layout space 1 of project 1 in printFilePath as "PDF" PDF output style "No Compression"
 	close document 1 without saving
-
+	
 end tell
 
 --copies proof to proofs shortrun folder

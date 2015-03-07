@@ -56,7 +56,7 @@ tell application "Finder"
 	set theFilename to the name of theFile as string
 	set dbdate to text 11 thru 14 of theFilename
 	set mergeFolder to "MERGE CENTRAL:SUPERmerge 2:Merges:"
-	set mergeFOlderName to dbdate & "2014_merge"
+	set mergeFOlderName to dbdate & "2015_merge"
 	make new folder at folder mergeFolder with properties {name:mergeFOlderName}
 	set theTemplate to "MERGE CENTRAL:SUPERmerge 2:Merges:x_HOM_MergeTHIS.qxp"
 	set thisMergeFolder to mergeFolder & mergeFOlderName
