@@ -48,19 +48,21 @@ set mergedQuarkDocsFolder to "HOM_Shortrun:SUPERmergeOUT:Merged Quark Docs:"
 tell application "Microsoft Excel" to open superMergeDB
 set i to firstRow
 repeat while ExitVariable is not "Exit"
-	
+
 	--first chunk of psuedo repeat loop
 	repeat 1 times
-		
+
 		--resets value of prevArt, prevInfo, prevJob, and copyvar to avoid jobs copying previous folder from previous row in DB
 		set prevArt to ""
 		set prevInfo to ""
 		set prevJob to ""
-		--this one caused me problems. 
+		--this one caused me problems.
 		--it was getting set to true when a job was found in printed or active jobs, but then when the next job was in the archives, it stayed true, and when the script checks which place to copy from by checking that variable, it found it true and used 'FinishedOldPath' to copy, which was still set as the value from the previous row.
-		set copyvar to false
-		
-		
+		set copyvar to true
+		set FinishedArchivePath to ""
+		set FinishedOldPath to ""
+
+
 		tell application "Microsoft Excel"
 			tell row i
 				set imageNames to {value of cell 13, value of cell 14, value of cell 15, value of cell 16, value of cell 29, value of cell 30, value of cell 31, value of cell 32, value of cell 33}
@@ -70,28 +72,28 @@ repeat while ExitVariable is not "Exit"
 				set prevInfo to string value of cell 35
 			end tell
 		end tell
-		
+
 		--sets variables specific to this row
 		set thisQuarkDoc to mergedQuarkDocsFolder & quarkName as string
 		set thisJobFolder to activeJobsFolder & jobNumber as string
-		
+
 		--does a full exit if it finds no value for job number in database: when it reaches the end of the database
 		--the check for 0 is because excel was returning 0 as the value for an empty cell and I don't know why
-		
+
 		if jobNumber is "" or jobNumber is 0 then
 			set ExitVariable to "Exit"
 			exit repeat
 		end if
-		
-		
+
+
 		tell application "Finder"
 			if not (exists folder jobNumber of folder activeJobsFolder) then
 				make new folder at folder activeJobsFolder with properties {name:jobNumber}
 			end if
 		end tell
-		
+
 		cp(thisQuarkDoc, thisJobFolder)
-		
+
 		if prevArt is not "" then
 			try
 				set prevJob to find text "[0-9]{6}" in prevArt with regexp and string result
@@ -118,95 +120,91 @@ repeat while ExitVariable is not "Exit"
 			set skipvar to true
 			set textToLog to false
 		end if
-		
+
 		--skips over copying old job if the result of value check determines that it should be skipped
-		
+
 		if textToLog then
 			set errorOccured to true
 			logToFile(logText, LogFile)
 		end if
-		
+
 		if skipvar then
 			set skipvar to false
 			exit repeat
 		end if
-		
-		set testLog to "Macintosh HD:Users:maggie:desktop:testlog.txt"
-		set testLogText to "row: " & i & "\tJob Number: " & jobNumber & "\tPrevious Job Number: " & prevJob & "\n"
-		logToFile(testLogText, testLog)
-		
+
 		--this whole chunk is my (Alex) copy old job to new folder script
 		--whole copying process is wrapped in a try block. If it fails, it just continues on to the next job.
 		try
-			
+
 			--this is for if the job is in the older archives
-			
+
 			if prevJob is less than 226000 then
-				
+
 				set copyvar to false
 				set Chars to characters of prevJob
 				set First3 to item 1 of Chars & item 2 of Chars & item 3 of Chars as string
 				set OldPth to "ARCHIVES VINTAGE:HOM Archive Jobs:" & First3 & "xxx.jobs:"
 				set thisSource to OldPth & prevJob
-				
+
 				-- shell script that finds and copies old job folder to new one
 				log thisSource
 				log thisJobFolder
 				cp_all(thisSource, thisJobFolder)
-				
+
 			end if
-			
+
 			--Checks Various folders where old job might be
-			
+
 			tell application "Finder"
-				
+
 				--checks for old job in HOM Calendars 2006; copies if found
 				if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob then
 					set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob
-					
+
 					--checks if _1 is appended to end of folder name in 2006 calendars
 				else if exists "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1" then
 					set FinishedOldPath to "HOM_Shortrun:HOM Calendars 2006:" & prevJob & "_1"
-					
+
 					--checks for old job in HOM Calendars PRINTED; copies if found
 				else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob then
 					set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob
-					
+
 					--checks if _1 is appended to end of folder name in HOM Calendars PRINTED
 				else if exists "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1" then
 					set FinishedOldPath to "HOM_Shortrun:HOM Calendars PRINTED:" & prevJob & "_1"
-					
+
 					--checks for old job in HOM Printed Jobs; copies if found
 				else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob then
 					set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob
-					
+
 					--checks if _1 is appended to end of folder name in Printed
 				else if exists "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1" then
 					set FinishedOldPath to "HOM_Shortrun:~HOM Printed Jobs:" & prevJob & "_1"
-					
+
 					--checks for old job in Active Jobs; copies if found
 				else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob then
 					set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob
-					
+
 					--checks if _1 is appended to end of folder name in active
 				else if exists "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1" then
 					set FinishedOldPath to "HOM_Shortrun:~HOM Active Jobs:" & prevJob & "_1"
-					
-					
+
+
 					--if none of those exist, checks the archives for the folder
-					
+
 				else
-					
+
 					set copyvar to false
 					--converts prevJob back into a string
 					set prevJob to prevJob as string
-					
+
 					set OldPth to "HOM_Shortrun:~HOM Archive Jobs:" & characters 1 thru 3 of prevJob & "xxx.jobs:" as string
 					set FinishedArchivePath to OldPth & prevJob
-					
+
 				end if
 			end tell
-			
+
 			--duplicates whichever path was found to exist into the Active Job Folder
 			if copyvar then
 				log FinishedOldPath
@@ -217,26 +215,26 @@ repeat while ExitVariable is not "Exit"
 				log thisJobFolder
 				cp_all(FinishedArchivePath, thisJobFolder)
 			end if
-			
+
 		on error errStr number errorNumber
 			set errorOccured to true
 			set logText to (current date) & tab & jobNumber & tab & tab & prevJob & tab & errStr & tab & errorNumber as text
 			logToFile(logText, LogFile)
 		end try
-		
+
 		--end of the copy old folder to new folder
-		
-		
+
+
 	end repeat
 	--end of first pseudo repeat loop and beginning of second
 	repeat 1 times
-		
+
 		--moves image files to Job Folder in Active Jobs
 		repeat with thisImage in imageNames
-			
+
 			--sets variables specific to this row
 			set thisImagePath to clientImagesFolder & thisImage
-			
+
 			if contents of thisImage is not "" then
 				try
 					cp(thisImagePath, thisJobFolder)
@@ -247,9 +245,9 @@ repeat while ExitVariable is not "Exit"
 				end try
 			end if
 		end repeat
-		
+
 		set i to i + 1
-		
+
 	end repeat
 end repeat
 
@@ -266,9 +264,9 @@ repeat while ExitVariable is not "Exit"
 		end tell
 	end tell
 	if jobNumber is "" then exit repeat
-	
+
 	repeat with thisImage in imageNames
-		
+
 		--sets variable specific to this row
 		if contents of thisImage is not "" then
 			tell application "Finder"
