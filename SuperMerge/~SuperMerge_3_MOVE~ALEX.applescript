@@ -58,7 +58,9 @@ repeat while ExitVariable is not "Exit"
 		set prevJob to ""
 		--this one caused me problems. 
 		--it was getting set to true when a job was found in printed or active jobs, but then when the next job was in the archives, it stayed true, and when the script checks which place to copy from by checking that variable, it found it true and used 'FinishedOldPath' to copy, which was still set as the value from the previous row.
-		set copyvar to false
+		set copyvar to true
+		set FinishedArchivePath to ""
+		set FinishedOldPath to ""
 		
 		
 		tell application "Microsoft Excel"
