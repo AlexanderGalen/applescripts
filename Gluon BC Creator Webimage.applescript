@@ -60,7 +60,22 @@ tell application "Microsoft Excel"
 				set previewOutputFile to thisTemplateName & ".P.P"
 				set placeholderPhoto to "GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3APlaceHolder_Headshot.eps"
 				
-				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & previewOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & placeholderPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=Agent%20Name&txtB_Font_InfoLine1=&txtInfoLine2=Title&txtInfoLine3=Info%20Line%201&txtInfoLine4=Info%20Line%202&txtInfoLine5=Info%20Line%203&txtInfoLine6=Info%20Line%204&txtInfoLine7=Info%20Line%205&txtInfoLine8=Info%20Line%206&txtInfoLine9=Info%20Line%207&txtInfoLine10=Info%20Line%208&txtInfoLine11=Info%20Line%209&txtInfoLine12=Info%20Line%2010&txtInfoLine13=Info%20Line%2011&txtInfoLine14=Info%20Line%2012&txtSymbol1=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol1-placeholder.jpg&txtSymbol2=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol2-placeholder.jpg&txtSymbol3=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol3-placeholder.jpg&btnSend=Send%20to%20Quark"
+				set line1 to "Agent%20Name"
+				set line2 to "Title"
+				set line3 to "Info%20Line%201"
+				set line4 to "Info%20Line%202"
+				set line5 to "Info%20Line%203"
+				set line6 to "Info%20Line%204"
+				set line7 to "Info%20Line%205"
+				set line8 to "Info%20Line%206"
+				set line9 to "Info%20Line%207"
+				set line10 to "Info%20Line%208"
+				set line11 to "Info%20Line%209"
+				set line12 to "Info%20Line%2010"
+				set line13 to "Info%20Line%2011"
+				set line14 to "Info%20Line%2012"
+				
+				set dataString to staticData & "ddlTemplateDir=" & thisTemplateDir & "&txtTemplate=" & thisTemplateName & "&txtOutputFilename=" & previewOutputFile & "&txtCompression=10&txtScale=300&txtPhoto1=" & placeholderPhoto & "&txtLogo1=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtbackground=GBS-Xserve%3ALibrary%3AWebServer%3ADocuments%3Aprep-webimages%3A&txtInfoLine1=" & line1 & "&txtB_Font_InfoLine1=&txtInfoLine2=" & line2 & "&txtInfoLine3=" & line3 & "&txtInfoLine4=" & line4 & "&txtInfoLine5=" & line5 & "&txtInfoLine6=" & line6 & "&txtInfoLine7=" & line7 & "&txtInfoLine8=" & line8 & "&txtInfoLine9=" & line9 & "&txtInfoLine10=" & line10 & "&txtInfoLine11=" & line11 & "&txtInfoLine12=" & line12 & "&txtInfoLine13=" & line13 & "&txtInfoLine14=" & line14 & "&txtSymbol1=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol1-placeholder.jpg&txtSymbol2=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol2-placeholder.jpg&txtSymbol3=Quark%3AHPS%20Assets%3ARealtor%20Symbols%20Stroked%3Asymbol3-placeholder.jpg&btnSend=Send%20to%20Quark"
 				
 				set pdfDestination to quoted form of ("/Users/maggie/documents/WEB MERGE/Full PDFS/" & previewOutputFile & ".pdf")
 				set previewPdfUrl to "http://gluon.houseofmagnets.com/InProduction/TEST/" & previewOutputFile & ".pdf"
