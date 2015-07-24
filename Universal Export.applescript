@@ -151,10 +151,10 @@ tell application "QuarkXPress"
 		--selects every box that is not named. this should only be the product and any boxes manually created.
 		--uses two separate try blocks because one of the two will often fail, and it should execute both select commands even if the first fails. the second wont execute if they are in the same block
 		try
-			set selected of every generic box whose name is "" to true
+			set name of every generic box whose name is null to ""
 		end try
 		try
-			set selected of every generic box whose name is null to true
+			set selected of every generic box whose name is "" to true
 		end try
 		set thisProduct to selection
 		
