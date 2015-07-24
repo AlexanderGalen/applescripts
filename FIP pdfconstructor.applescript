@@ -90,17 +90,17 @@ repeat with TheItem in filelist
 	set startSeconds to time of (current date)
 	
 	set ExitVar to ""
-
+	
 	set ExcelDoc to TheItem as string
 	
----- STARTS TO BUILD XML FOR PDF CONSTRUCTOR ------
-
+	---- STARTS TO BUILD XML FOR PDF CONSTRUCTOR ------
+	
 	set r to 2
 	set FIPAutomation to "Merge Central:FIP AUTOMATION:"
 	set pdfBasePath to FIPAutomation & "Found Image Press Calendars:"
 	set theXMLFile to FIPAutomation & "pdfconstructor:FIP_Construct.pdfc"
 	set finishedXML to ""
-
+	
 	tell application "Microsoft Excel"
 		open file ExcelDoc
 		tell row 2
@@ -108,10 +108,10 @@ repeat with TheItem in filelist
 			set clientName to string value of cell 2
 		end tell
 	end tell
-
+	
 	set coverText to "FIP_" & orderNumber & " " & clientName
 	set finishedPDF to FIPAutomation & "~~~Orders:FIP_" & orderNumber & "." & clientName & ".pdf"
-
+	
 	set finishedXML to finishedXML & "<?xml version='1.0' encoding='UTF-8'?>
 	<docasm linearized='true' version='1.4'>
 		<resources>
@@ -126,7 +126,7 @@ repeat with TheItem in filelist
 					<text font='Helvetica' font-size='18' color='[.4 .3 .3 1]' x='Center' y='Center' style='text-align:center' frame='#f1'>" & coverText & "</text>
 				</elements>
 			</page>" & return
-
+	
 	repeat
 		tell application "Microsoft Excel"
 			tell row r
@@ -134,12 +134,12 @@ repeat with TheItem in filelist
 					set TotalQty to value of column 3
 					exit repeat
 				end if
-
+				
 				set thisPDF to string value of column 4
-				set qty to (value of column 3/6)
+				set qty to ((value of column 3) / 6)
 			end tell
 		end tell
-
+		
 		set thisPDF to pdfBasePath & "FIP_" & thisPDF as string
 		set thisPDF to POSIX path of thisPDF
 		repeat qty times
@@ -147,31 +147,31 @@ repeat with TheItem in filelist
 		end repeat
 		set r to r + 1
 	end repeat
-
+	
 	tell application "Microsoft Excel"
 		close active workbook saving no
 	end tell
-
+	
 	set finishedXML to finishedXML & "	</pages>
 	</docasm>"
-
+	
 	set fileToEdit to open for access file theXMLFile with write permission
-		set eof fileToEdit to 0
-		write finishedXML to fileToEdit starting at eof
+	set eof fileToEdit to 0
+	write finishedXML to fileToEdit starting at eof
 	close access file theXMLFile
-
-
------ END OF XML BUILD ------
-
-------Calls PDF Constructor -----
-
-set finishedPDF to quoted form of POSIX path of finishedPDF
-set theXMLFile to quoted form of POSIX path of theXMLFile
-
-with timeout of 86400 seconds
-	do shell script "pdfconstructor -f " & theXMLFile & " -o " &  finishedPDF
-end timeout
-
+	
+	
+	----- END OF XML BUILD ------
+	(*
+	------Calls PDF Constructor -----
+	
+	set finishedPDF to quoted form of POSIX path of finishedPDF
+	set theXMLFile to quoted form of POSIX path of theXMLFile
+	
+	with timeout of 86400 seconds
+		do shell script "pdfconstructor -f " & theXMLFile & " -o " & finishedPDF
+	end timeout
+	
 	
 	set timeString to time string of (current date) as string
 	if length of timeString is 11 then
@@ -188,7 +188,7 @@ end timeout
 	
 	--opens the logs and inputs this job's info at the end of the log
 	set thisUsername to short user name of (system info)
-	set logText to TotalQty & tab & OrderNumber & tab & StartTime & tab & FinishTime & tab & timeDiff & tab & thisUsername as string
+	set logText to TotalQty & tab & orderNumber & tab & StartTime & tab & FinishTime & tab & timeDiff & tab & thisUsername as string
 	set LogFile to "MERGE CENTRAL:FIP AUTOMATION:Logs:FIP Automation Log.txt"
 	
 	logToFile(logText, LogFile)
@@ -199,5 +199,6 @@ end timeout
 		duplicate ExcelDoc to "ART DEPARTMENT-NEW:For SQL:FIP:Merged:"
 		delete ExcelDoc
 	end tell
+	*)
 	
 end repeat
