@@ -93,9 +93,9 @@ tell application "QuarkXPress"
 end tell
 
 if theWidth is 4 then
-		set shape to "CACH"
+	set shape to "CACH"
 else 
-	set  shape to "CACC"
+	set shape to "CACC"
 end if
 
 set thisPosixPrintFile to quoted form of POSIX path of thisPrintFile
