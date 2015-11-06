@@ -22,7 +22,7 @@ end if
 if not (documentOpen and validSelection) then
 	tell application "QuarkXPress"
 		activate
-		display alert "For this script to work, Quark must be running, have a document open, and have area which you would like to make a printfile with selected"
+		display alert "For this script to work, Quark must be running, have a document open, and have area which you would like to make a printfile with selected."
 	end tell
 	return
 end if
@@ -34,7 +34,7 @@ tell application "QuarkXPress"
 		set missingImages to missing of every image
 		set modifiedImages to modified of every image
 		if (missingImages contains true or modifiedImages contains true) then
-			display dialog "Document contains Images that are either unlinked or modified, please update them before running this script"
+			display dialog "Document contains Images that are either unlinked or modified, please update them, then try running this script again."
 		end if
 	end tell
 	set theName to name of document 1 as string
@@ -65,22 +65,14 @@ tell application "QuarkXPress"
 	set theWidth to x2 - x1
 	set theHeight to y2 - y1
 	
-	set impositionTemplatesPath to "Resource:Templates:Shortrun Templates.New:X.Igen.SR Templates:"
-	set newDocProperties to {page height:theHeight, page width:theWidth}
-	
-	--sets imposition templates and finished imposed filename according to size of product.
-	if theWidth is 4 then
-		set impositionTemplate to impositionTemplatesPath & "~CACH.HouseShape CalendarPads:CACH.House_28up Layout.qxp"
-		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CACH.print.pdf"
-	else if theWidth is 3.75 then
-		set impositionTemplate to impositionTemplatesPath & "~CACC:CACC.Print.30up.qxp"
-		set imposedFile to activeJobs & jobNumber & ":" & jobNumber & ".CACC.print.pdf"
-	else
-		display dialog "Sizing is neither a CACC or CACH"
+	if theWidth is not 4 and theWidth is not 3.75 then
+		display dialog "Sizing is neither a CCCP or CHCP."
 		return
 	end if
 	
 	close document 1 without saving
+	
+	set newDocProperties to {page height:theHeight, page width:theWidth}
 	make new document with properties newDocProperties
 	
 	tell document 1
@@ -93,24 +85,21 @@ tell application "QuarkXPress"
 			set bounds of picture box 1 to {0, 0, theHeight, theWidth}
 		end if
 		
-		print print output style "Proof"
 	end tell
 	
 	export layout space 1 of project 1 in thisPrintFile as "PDF" PDF output style "No Compression"
-	save document 1 in thisQuarkDoc
-	close every project without saving
-	
-	open file impositionTemplate
-	set allBoxes to every picture box of document 1
-	repeat with theSelection in allBoxes
-		if layername of theSelection is "Default" then
-			set image 1 of theSelection to alias thisPrintFile
-		end if
-	end repeat
-	export layout space 1 of project 1 in imposedFile as "PDF" PDF output style "No Compression"
 	close document 1 without saving
+	
 end tell
 
-tell application "Finder"
-	delete thisPrintFile
-end tell
+if theWidth is 4 then
+		set shape to "CACH"
+else 
+	set  shape to "CACC"
+end if
+
+set thisPosixPrintFile to quoted form of POSIX path of thisPrintFile
+--set nodeScript to quoted form of "/Volumes/RESOURCE/Scripting/AAASpectacularAlex Scripts/Impose Calendar Pads.js"
+set nodeScript to quoted form of "/Users/Alex/Scripts/Impose Calendar Pads.js"
+
+do shell script "/usr/local/bin/node " & nodeScript & " " & thisPosixPrintFile & " " & shape
