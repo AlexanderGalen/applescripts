@@ -1,23 +1,21 @@
 var modulesPath = "/Volumes/RESOURCE/node_modules/"
 
-var fs = require('fs');
+var fs = require(modulesPath + 'fs-extra');
 var hummus = require(modulesPath + 'hummus');
 var mv = require(modulesPath + 'mv');
 var path = require('path');
 
-// script expects two parameters to be passed to it: the path to the file to be imposed, and the shape of the file, either CACC or CACH
+// script expects three parameters to be passed to it: the path to the file to be imposed, the destination for the imposed file,
+// and the shape of the file(either CACC or CACH)
 var fileToImpose = process.argv[2];
-var shape = process.argv[3];
+var finishedPDFName = process.argv[3]
+var shape = process.argv[4];
+
 
 
 // function to impose a file. imposes slightly differently depending on the shape passed to it
 // shape can either be "CACC" or "CACH".
 function impose(shape) {
-
-	// builds the finished pdf name based on the path to the file to impose
-	var parentFolder = path.dirname(fileToImpose);
-	var jobNumber = path.basename(parentFolder)
-	var finishedPDFName = parentFolder + "/" + jobNumber + "." + shape + ".pdf"
 
 	//creates the file for the imposed PDF, a new page, and a content context for writing to.
 	var pdfWriter = hummus.createWriter(finishedPDFName);
@@ -60,7 +58,6 @@ function impose(shape) {
 			if(shape == "CACH") evenOddCounter++;
 			// if its on an even column, draw it rotated 90º and increment the small increment
 			if(evenOddCounter%2 == 0) {
-				console.log(3, "rotating 90º" )
 				//cxt.drawImage(xPos,yPos,fileToImpose,rotate270);
 				// rotate current context, then draw the xobject for the image to impose, then reset the context.
 				cxt.q()
@@ -72,7 +69,6 @@ function impose(shape) {
 			}
 			// if its on an odd column, draw it rotated 270º and increment the big increment
 			else {
-				console.log(3, "rotating 270º" )
 				cxt.q()
 				.cm(1,0,0,1,xPos,yPos) // this translates state to current position
 				.cm(0,1,-1,0,padHeight,0) // this rotates 90º
@@ -105,6 +101,11 @@ else {
 
 // run imposition
 impose(shape);
+
+// copy imposed file to spot that is easy for Greta to find them
+var imposedFileName = path.basename(finishedPDFName);
+var copyDest = "/Volumes/MERGE CENTRAL/Web2P Print Files/~~ReadyToPrint/" + shape + "/" + imposedFileName;
+fs.copy(finishedPDFName, copyDest, function(err){console.log("Failed to copy to imposed files directory")})
 
 // delete printfile once we've imposed
 // this is to prevent errors where quark fails to save over existing printfiles

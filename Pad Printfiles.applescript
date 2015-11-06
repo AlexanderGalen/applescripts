@@ -37,16 +37,52 @@ tell application "QuarkXPress"
 			display dialog "Document contains Images that are either unlinked or modified, please update them, then try running this script again."
 		end if
 	end tell
-	set theName to name of document 1 as string
-	try
-		set jobNumber to find text "[0-9]{6}" in theName with regexp and string result
-	on error
-		set jobNumber to text returned of (display dialog "Input Job Number Please" default answer "")
-	end try
 	
 	set activeJobs to "HOM_Shortrun:~HOM Active Jobs:"
-	set thisPrintFile to activeJobs & jobNumber & ":" & jobNumber & ".printfile.pdf"
-	set thisQuarkDoc to activeJobs & jobNumber & ":" & jobNumber & ".1up.print.qxp"
+	
+	set docName to name of document 1 as string
+	set AppleScript's text item delimiters to "."
+	set splitName to text items of docName
+	set docName to items 1 thru ((length of splitName) - 2) of splitName as string
+	set AppleScript's text item delimiters to {""}
+		
+	-- get path to job folder from document, or ask for it if document has no file on disk
+	set jobPath to file path of document 1
+	if jobPath is null then
+		set jobNumber to text returned of (display dialog "Input job number please" default answer "")
+		set docName to jobNumber
+		set jobPath to activeJobs & jobNumber & ":" & jobNumber & ".HOM.qxp"
+	else 
+		set jobPath to jobPath as string
+	end if
+	
+	-- get the parent folder to save into from jobPath
+	set AppleScript's text item delimiters to ":"
+	set splitPath to text items of jobPath
+	set parentFolder to items 1 thru ((length of splitPath) - 1) of splitPath as string
+	set AppleScript's text item delimiters to {""}
+	
+	-- check if job folder exists, and create it if not
+	tell application "Finder"
+		set folderExists to exists of parentFolder
+		if not folderExists then
+			
+			set AppleScript's text item delimiters to ":"
+			set splitPath to text items of parentFolder
+			set parentParentFolder to items 1 thru ((length of splitPath) - 1) of splitPath as string
+			set parentFolderName to item (length of splitPath) as string
+			set AppleScript's text item delimiters to {""}
+			
+			make new folder at parentParentFolder with properties {name:parentFolderName}
+			
+		end if
+			
+	end tell	
+	
+	
+	
+	set thisPrintFile to parentFolder & ":" &  docName & ".printfile.pdf"
+	set thisDestinationFile to parentFolder & ":" & docName
 	
 	set theSelection to selection
 	if class of theSelection is group box then
@@ -99,7 +135,9 @@ else
 end if
 
 set thisPosixPrintFile to quoted form of POSIX path of thisPrintFile
+set thisPosixDestinationFile to quoted form of POSIX path of (thisDestinationFile & "." & shape & ".pdf")
+log thisPosixDestinationFile
 --set nodeScript to quoted form of "/Volumes/RESOURCE/Scripting/AAASpectacularAlex Scripts/Impose Calendar Pads.js"
 set nodeScript to quoted form of "/Users/Alex/Scripts/Impose Calendar Pads.js"
 
-do shell script "/usr/local/bin/node " & nodeScript & " " & thisPosixPrintFile & " " & shape
+do shell script "/usr/local/bin/node " & nodeScript & " " & thisPosixPrintFile & " " & thisPosixDestinationFile & " " & shape
